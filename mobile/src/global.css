@@ -2,6 +2,30 @@
 @import "tailwindcss/preflight.css" layer(base);
 @import "tailwindcss/utilities.css";
 
+/* Light mode color tokens */
+:root {
+	--color-bg: #f9fafb; /* gray-50 */
+	--color-surface: #ffffff;
+	--color-surface-raised: #f3f4f6; /* gray-100 */
+	--color-text: #111827; /* gray-900 */
+	--color-text-muted: #6b7280; /* gray-500 */
+	--color-border: #e5e7eb; /* gray-200 */
+	--color-accent: #3b82f6; /* blue-500 */
+}
+
+/* Dark mode color tokens */
+@media (prefers-color-scheme: dark) {
+	:root {
+		--color-bg: #030712; /* gray-950 */
+		--color-surface: #111827; /* gray-900 */
+		--color-surface-raised: #1f2937; /* gray-800 */
+		--color-text: #ffffff;
+		--color-text-muted: #9ca3af; /* gray-400 */
+		--color-border: #1f2937; /* gray-800 */
+		--color-accent: #60a5fa; /* blue-400 */
+	}
+}
+
 /* Platform-specific font families */
 @media android {
 	:root {
