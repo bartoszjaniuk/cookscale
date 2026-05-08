@@ -1,0 +1,10 @@
+{
+  "private": true,
+  "name": "rn-kcal-companion",
+  "scripts": {
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "husky": "9.1.7"
+  }
+}

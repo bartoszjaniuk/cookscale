@@ -19,9 +19,7 @@ import {
 // CSS-enabled Link
 export const Link = (
 	props: React.ComponentProps<typeof RouterLink> & { className?: string },
-) => {
-	return useCssElement(RouterLink, props, { className: "style" });
-};
+) => useCssElement(RouterLink, props, { className: "style" });
 
 Link.Trigger = RouterLink.Trigger;
 Link.Menu = RouterLink.Menu;
@@ -39,17 +37,14 @@ export type ViewProps = React.ComponentProps<typeof RNView> & {
 	className?: string;
 };
 
-export const View = (props: ViewProps) => {
-	return useCssElement(RNView, props, { className: "style" });
-};
+export const View = (props: ViewProps) =>
+	useCssElement(RNView, props, { className: "style" });
 View.displayName = "CSS(View)";
 
 // Text
 export const Text = (
 	props: React.ComponentProps<typeof RNText> & { className?: string },
-) => {
-	return useCssElement(RNText, props, { className: "style" });
-};
+) => useCssElement(RNText, props, { className: "style" });
 Text.displayName = "CSS(Text)";
 
 // ScrollView
@@ -58,28 +53,23 @@ export const ScrollView = (
 		className?: string;
 		contentContainerClassName?: string;
 	},
-) => {
-	return useCssElement(RNScrollView, props, {
+) =>
+	useCssElement(RNScrollView, props, {
 		className: "style",
 		contentContainerClassName: "contentContainerStyle",
 	});
-};
 ScrollView.displayName = "CSS(ScrollView)";
 
 // Pressable
 export const Pressable = (
 	props: React.ComponentProps<typeof RNPressable> & { className?: string },
-) => {
-	return useCssElement(RNPressable, props, { className: "style" });
-};
+) => useCssElement(RNPressable, props, { className: "style" });
 Pressable.displayName = "CSS(Pressable)";
 
 // TextInput
 export const TextInput = (
 	props: React.ComponentProps<typeof RNTextInput> & { className?: string },
-) => {
-	return useCssElement(RNTextInput, props, { className: "style" });
-};
+) => useCssElement(RNTextInput, props, { className: "style" });
 TextInput.displayName = "CSS(TextInput)";
 
 // AnimatedScrollView
@@ -89,19 +79,18 @@ export const AnimatedScrollView = (
 		contentClassName?: string;
 		contentContainerClassName?: string;
 	},
-) => {
-	return useCssElement(Animated.ScrollView, props, {
+) =>
+	useCssElement(Animated.ScrollView, props, {
 		className: "style",
 		contentClassName: "contentContainerStyle",
 		contentContainerClassName: "contentContainerStyle",
 	});
-};
 
 // TouchableHighlight with underlayColor extraction
-function XXTouchableHighlight(
+const XXTouchableHighlight = (
 	props: React.ComponentProps<typeof RNTouchableHighlight>,
-) {
-	const { underlayColor, ...style } = StyleSheet.flatten(props.style) || {};
+) => {
+	const { underlayColor, ...style } = (StyleSheet.flatten(props.style) || {}) as Record<string, any>;
 	return (
 		<RNTouchableHighlight
 			underlayColor={underlayColor as string | undefined}
@@ -109,11 +98,9 @@ function XXTouchableHighlight(
 			style={style}
 		/>
 	);
-}
+};
 
 export const TouchableHighlight = (
 	props: React.ComponentProps<typeof RNTouchableHighlight>,
-) => {
-	return useCssElement(XXTouchableHighlight, props, { className: "style" });
-};
+) => useCssElement(XXTouchableHighlight, props, { className: "style" });
 TouchableHighlight.displayName = "CSS(TouchableHighlight)";
