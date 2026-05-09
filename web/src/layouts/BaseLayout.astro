@@ -1,0 +1,56 @@
+---
+import "@/styles/global.css";
+
+interface Props {
+	title: string;
+	description?: string;
+	robots?: string;
+	ogTitle?: string;
+	ogDescription?: string;
+}
+
+const {
+	title,
+	description = "Kalkulator makro: surowe ↔ po obróbce. Tryb produktu i AI dla całych dań.",
+	robots,
+	ogTitle,
+	ogDescription,
+} = Astro.props;
+
+const themeBootstrap = `(function(){try{var t=localStorage.getItem('cookscale-theme')||'light';if(t==='dark')document.documentElement.classList.add('dark');document.documentElement.dataset.theme=t;document.documentElement.dataset.colorTheme='amber';}catch(e){}})();`;
+
+const jsonLd = JSON.stringify({
+	"@context": "https://schema.org",
+	"@type": "SoftwareApplication",
+	name: "CookScale",
+	description: "Kalkulator makro: surowe ↔ po obróbce. Tryb produktu i AI dla całych dań.",
+	applicationCategory: "HealthApplication",
+	operatingSystem: "Web",
+	inLanguage: "pl-PL",
+	offers: { "@type": "Offer", price: "0", priceCurrency: "PLN" },
+});
+---
+
+<!doctype html>
+<html lang="pl">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>{title}</title>
+		<meta name="description" content={description} />
+		{robots && <meta name="robots" content={robots} />}
+		{ogTitle && <meta property="og:title" content={ogTitle} />}
+		{ogDescription && <meta property="og:description" content={ogDescription} />}
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=Playfair+Display:ital,wght@0,300;0,400;1,300;1,400&display=swap"
+			rel="stylesheet"
+		/>
+		<script is:inline set:html={themeBootstrap} />
+		<script type="application/ld+json" set:html={jsonLd} />
+	</head>
+	<body>
+		<slot />
+	</body>
+</html>

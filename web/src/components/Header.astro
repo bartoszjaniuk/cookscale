@@ -1,0 +1,142 @@
+---
+import { ThemeToggle } from "@/components/theme-toggle";
+
+interface Props {
+	currentPath: string;
+}
+
+const { currentPath } = Astro.props;
+
+const navLinks = [
+	{ href: "/", label: "Start" },
+	{ href: "/calculator", label: "Kalkulator" },
+	{ href: "/ai", label: "Danie z AI" },
+	{ href: "/history", label: "Historia" },
+];
+---
+
+<header
+	class="sticky top-0 z-40 backdrop-blur"
+	style="background: color-mix(in oklab, var(--color-background) 80%, transparent)"
+>
+	<div class="max-w-6xl mx-auto px-5 md:px-8 h-16 flex items-center justify-between">
+		<a href="/" class="flex items-baseline">
+			<span class="font-serif text-[26px] leading-none">CookScale</span>
+			<span class="text-[26px] leading-none" style="color: var(--color-primary)">.</span>
+		</a>
+
+		<!-- Desktop nav -->
+		<nav class="hidden md:flex items-center gap-8">
+			{
+				navLinks.map(({ href, label }) => (
+					<a
+						href={href}
+						class="text-[15px] tracking-[-0.01em] transition-colors"
+						style={
+							currentPath === href
+								? "color: var(--color-primary)"
+								: "color: var(--color-foreground)"
+						}
+					>
+						{label}
+					</a>
+				))
+			}
+		</nav>
+
+		<!-- Right side -->
+		<div class="flex items-center gap-3">
+			<ThemeToggle client:load />
+			<a href="/login" class="btn-ghost hidden sm:inline-flex !py-2.5 !px-5 !text-[14px]">Zaloguj</a
+			>
+			<a href="/login" class="btn-primary hidden sm:inline-flex !py-2.5 !px-5 !text-[14px]"
+				>Rejestracja</a
+			>
+
+			<!-- Hamburger (mobile only) -->
+			<button
+				id="nav-toggle"
+				type="button"
+				aria-label="Otwórz menu"
+				aria-expanded="false"
+				aria-controls="mobile-menu"
+				class="md:hidden grid place-items-center w-9 h-9 rounded-lg border transition-colors"
+				style="color: var(--color-foreground); background: var(--color-secondary); border-color: var(--color-border);"
+			>
+				<svg
+					id="icon-open"
+					width="20"
+					height="20"
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="2"
+					stroke-linecap="round"
+					stroke-linejoin="round"
+				>
+					<line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"
+					></line><line x1="3" y1="18" x2="21" y2="18"></line>
+				</svg>
+				<svg
+					id="icon-close"
+					class="hidden"
+					width="20"
+					height="20"
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="2"
+					stroke-linecap="round"
+					stroke-linejoin="round"
+				>
+					<line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line>
+				</svg>
+			</button>
+		</div>
+	</div>
+
+	<!-- Mobile menu -->
+	<div
+		id="mobile-menu"
+		class="hidden md:hidden border-t"
+		style="border-color: var(--color-border); background: var(--color-background)"
+	>
+		<nav class="max-w-6xl mx-auto px-5 py-4 flex flex-col gap-1">
+			{
+				navLinks.map(({ href, label }) => (
+					<a
+						href={href}
+						class="text-[16px] py-3 px-3 rounded-xl transition-colors"
+						style={
+							currentPath === href
+								? `color: var(--color-primary); background: var(--color-primary-muted)`
+								: `color: var(--color-foreground)`
+						}
+					>
+						{label}
+					</a>
+				))
+			}
+			<div class="flex gap-3 pt-3 mt-1 border-t" style="border-color: var(--color-border)">
+				<a href="/login" class="btn-ghost !py-2.5 !px-5 !text-[14px] flex-1 text-center">Zaloguj</a>
+				<a href="/login" class="btn-primary !py-2.5 !px-5 !text-[14px] flex-1 text-center"
+					>Rejestracja</a
+				>
+			</div>
+		</nav>
+	</div>
+</header>
+
+<script>
+	const toggle = document.getElementById("nav-toggle");
+	const menu = document.getElementById("mobile-menu");
+	const iconOpen = document.getElementById("icon-open");
+	const iconClose = document.getElementById("icon-close");
+
+	toggle?.addEventListener("click", () => {
+		const isOpen = menu?.classList.toggle("hidden") === false;
+		toggle.setAttribute("aria-expanded", String(isOpen));
+		iconOpen?.classList.toggle("hidden", isOpen);
+		iconClose?.classList.toggle("hidden", !isOpen);
+	});
+</script>

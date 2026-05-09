@@ -2,16 +2,54 @@
 
 ## 1. Przegląd produktu
 
-CookScale to mobilna aplikacja (Expo React Native) skierowana do osób liczących kalorie i makroskładniki, która rozwiązuje problem niedokładnej estymacji wartości odżywczych produktów po obróbce termicznej. Aplikacja umożliwia przeliczanie gramatury i makro między stanem surowym a ugotowanym/usmażonym/upieczonym w oparciu o współczynniki zmiany gramatury z tabel USDA yield tables.
+CookScale to produkt dostępny na dwóch platformach: aplikacja mobilna (Expo React Native) oraz aplikacja webowa (Astro.js + React), skierowany do osób liczących kalorie i makroskładniki. Rozwiązuje problem niedokładnej estymacji wartości odżywczych produktów po obróbce termicznej — umożliwia przeliczanie gramatury i makro między stanem surowym a ugotowanym/usmażonym/upieczonym w oparciu o współczynniki zmiany gramatury z tabel USDA yield tables.
+
+Obie platformy oferują pełen parytet funkcjonalny i współdzielą:
+
+- **Backend**: Supabase Edge Functions (Deno/TypeScript) + Supabase PostgreSQL
+- **Autentykację**: Supabase Auth — jedno konto działa zarówno na mobile, jak i na web
+- **Historię obliczeń**: przechowywana w Supabase, dostępna z obu platform
+- **AI**: wywołania LLM realizowane przez OpenRouter przez te same Edge Functions
 
 Produkt działa w modelu freemium:
 
 - Plan Free: tryb „produktu" (bez limitu dla zalogowanych) + 1 darmowy trial trybu AI
 - Plan Premium: tryb „dania z AI" bez limitu wywołań
 
-Backend oparty Supabase (Edge Functions). Wywołania LLM realizowane przez OpenRouter. Monetyzacja przez RevenueCat (App Store / Google Play). Interfejs dostępny w języku polskim i angielskim (i18next + react-i18next). Baza produktów dla trybu „produktu" jest budowana jako własna baza `canonical foods` skupiona na produktach surowych (raw, bez obróbki termicznej). Wszytkie tłumaczenia będą przechowywane lokalnie w warstwie mobile.
+Monetyzacja:
 
-Zakres dokumentu obejmuje wersję MVP aplikacji mobilnej.
+- **Mobile**: RevenueCat zintegrowany z App Store (iOS) i Google Play (Android)
+- **Web**: Stripe (lub inny web payment provider) — do wyboru w późniejszym etapie
+- Flaga `is_premium` w Supabase aktualizowana przez webhooks obu providerów; subskrypcja zakupiona na jednej platformie obowiązuje na obu
+
+Interfejs dostępny w języku polskim i angielskim (i18next + react-i18next na mobile; analogiczne tłumaczenia na web). Baza produktów dla trybu „produktu" jest budowana jako własna baza `canonical foods` skupiona na produktach surowych (raw, bez obróbki termicznej).
+
+### Struktura repozytorium (monorepo)
+
+```
+rn-kcal-companion/
+├── mobile/          # Expo React Native app (iOS + Android)
+├── web/             # Astro.js + React app (SSR, Node adapter)
+└── supabase/        # Wspólne migracje DB, Edge Functions, typy
+```
+
+### Stack technologiczny
+
+| Warstwa         | Mobile                          | Web                            | Wspólne                       |
+| --------------- | ------------------------------- | ------------------------------ | ----------------------------- |
+| Framework       | Expo ~54 / React Native 0.81    | Astro 6 + React 19             | —                             |
+| Routing         | Expo Router ~6                  | Astro file-based routing       | —                             |
+| Styling         | NativeWind v5 / Tailwind CSS v4 | Tailwind CSS v4                | —                             |
+| Komponenty UI   | Własne (tw/ wrapper)            | shadcn/ui + Radix UI           | —                             |
+| Animacje        | Reanimated ~4                   | CSS / Framer Motion (post-MVP) | —                             |
+| Auth            | Supabase Auth (supabase-js)     | Supabase Auth (@supabase/ssr)  | Supabase Auth                 |
+| Baza danych     | —                               | —                              | Supabase PostgreSQL           |
+| AI backend      | —                               | —                              | Supabase Edge Fn + OpenRouter |
+| Monetyzacja     | RevenueCat (IAP)                | Stripe (web payments)          | Flaga `is_premium` w Supabase |
+| i18n            | i18next + react-i18next         | i18next (lub analogiczne)      | Pliki pl.json, en.json        |
+| Package manager | bun                             | bun                            | —                             |
+
+Zakres dokumentu obejmuje wersję MVP obu platform (mobile i web).
 
 ---
 
@@ -25,7 +63,7 @@ b) Gramatura produktu zmienia się podczas obróbki termicznej w zależności od
 
 c) Szacowanie wartości odżywczych złożonych dań domowych (np. „makaron z sosem bolońskim") jest jeszcze bardziej skomplikowane i wymaga ręcznego sumowania składników – co jest żmudne i prowadzi do rezygnacji z rzetelnego liczenia kalorii.
 
-Docelowy użytkownik to osoba dbająca o dietę, śledząca kalorie i makro, korzystająca z urządzeń mobilnych i oczekująca szybkiego, wiarygodnego wyniku bez konieczności ręcznych przeliczeń. Aplikacja jest inspirowana istniejącym rozwiązaniem SizzleScale, a jej docelowi konkurenci post-MVP to Fitatu i Yazio.
+Docelowy użytkownik to osoba dbająca o dietę, śledząca kalorie i makro, korzystająca zarówno z urządzeń mobilnych, jak i przeglądarki internetowej, oczekująca szybkiego, wiarygodnego wyniku bez konieczności ręcznych przeliczeń. Aplikacja jest inspirowana istniejącym rozwiązaniem SizzleScale, a jej docelowi konkurenci post-MVP to Fitatu i Yazio.
 
 ---
 
@@ -35,7 +73,7 @@ Docelowy użytkownik to osoba dbająca o dietę, śledząca kalorie i makro, kor
 
 - Wyszukiwanie produktu w bazie danych (produkty ogólne: mięso, ryż, warzywa, strączki itp.)
 - Własna baza danych `canonical foods` (produkty ogólne, surowe/raw, bez EAN w MVP)
-- Nazwy canonical przechowywane po angielsku (bez dopisku „raw"), (mapowanie tłumaczeń po stronie mobile)
+- Nazwy canonical przechowywane po angielsku (bez dopisku „raw"); mapowanie tłumaczeń po stronie klienta (mobile i web)
 - Architektura bazy gotowa na produkty markowe z EAN i ręczne dodawanie przez użytkownika (post-MVP)
 - Wprowadzenie gramatury surowej → obliczenie gramatury po obróbce + makro (tryb standardowy)
 - Wprowadzenie gramatury po obróbce → obliczenie gramatury surowej + makro surowego produktu (tryb odwrotny)
@@ -45,7 +83,7 @@ Docelowy użytkownik to osoba dbająca o dietę, śledząca kalorie i makro, kor
   3. Pieczenie (baking)
 - Współczynniki zmiany gramatury pobierane z USDA yield tables lub innych źródeł. (Do ustalenia w późniejszym etapie)
 - Wynik: gramatura po obróbce (lub surowa w trybie odwrotnym) + makro (kalorie, białko, tłuszcze, węglowodany) na 100g i na całą porcję
-- Dostęp do 1–2 obliczeń bez rejestracji (onboarding „najpierw wartość, potem rejestracja”); limit egzekwowany po stronie urządzenia (local storage) — tryb produktu nie wymaga wywołania backendu
+- Dostęp do 1–2 obliczeń bez rejestracji (onboarding „najpierw wartość, potem rejestracja"); limit egzekwowany po stronie klienta (localStorage — mobile i web) — tryb produktu nie wymaga wywołania backendu
 - Pełny dostęp do trybu produktu po rejestracji (konto Free, bez limitu obliczeń)
 
 ### 3.2 Tryb „dania z AI" (Premium + 1 trial)
@@ -75,25 +113,44 @@ Docelowy użytkownik to osoba dbająca o dietę, śledząca kalorie i makro, kor
 
 ### 3.5 Monetyzacja
 
+**Mobile (iOS / Android)**
+
 - RevenueCat zintegrowany z App Store (iOS) i Google Play (Android)
-- Flaga `is_premium` w Supabase aktualizowana przez webhooks RevenueCat
+- Użytkownik może wybrać subskrypcję (miesięczna / roczna – opcje do ustalenia) i przejść przez natywny proces płatności App Store / Google Play
+- Po pomyślnym zakupie flaga `is_premium` w Supabase jest aktualizowana przez webhook RevenueCat
+- Opcja „Przywróć zakupy" dostępna w ustawieniach (RevenueCat sprawdza historię IAP)
+
+**Web**
+
+- Stripe (lub inny web payment provider — do finalnego wyboru przed implementacją) obsługuje zakup subskrypcji
+- Flow zakupu na web kieruje użytkownika przez Stripe Checkout / Payment Element
+- Po pomyślnym zakupie webhook Stripe aktualizuje flagę `is_premium` w Supabase
+- Subskrypcja zakupiona na web jest honorowana na mobile i odwrotnie (wspólna flaga `is_premium` per `user_id`)
+
+**Wspólne**
+
 - Plan Free: tryb produktu bez limitu + 1 trial AI
 - Plan Premium: tryb dania z AI bez limitu (dokładna liczba wywołań do ustalenia)
+- Webhook mobile (RevenueCat) i webhook web (Stripe) zapisują do tej samej tabeli `profiles` w Supabase
+- Po wygaśnięciu subskrypcji z dowolnej platformy flaga `is_premium` jest ustawiana na `false`
 
 ### 3.6 Bezpieczeństwo i limity API
 
 - Limit per IP: ok. 20 wywołań AI / 24h (abuse prevention; wartość tymczasowa, do kalibracji po obserwacji ruchu; konfiguracja backendowa bez zmian w OpenRouter)
-- Limit anonimowych obliczeń w trybie produktu egzekwowany po stronie urządzenia (local storage) — brak wywołania backendu w trybie produktu
+- Limit anonimowych obliczeń w trybie produktu egzekwowany po stronie klienta (localStorage, zarówno mobile jak i web) — brak wywołania backendu w trybie produktu
 - Limit produktowy dla użytkowników Premium egzekwowany przez backend na podstawie JWT user ID
-- Backend: Supabase Edge Functions (Deno/TypeScript); autoryzacja przez JWT
+- Backend: Supabase Edge Functions (Deno/TypeScript); autoryzacja przez JWT — te same Edge Functions obsługują mobile i web
 - Sól do haszowania adresu IP w logach AI (GDPR) przechowywana w **Supabase Vault** jako stały secret — nie rotowana w MVP
+- Webhooks płatności (RevenueCat + Stripe) weryfikowane przez podpisane nagłówki (HMAC/secret) przed aktualizacją flagi `is_premium`
 
 ### 3.7 Wielojęzyczność
 
-- Biblioteka: i18next + react-i18next
-- Języki MVP: polski (pl.json) i angielski (en.json)
-- Tłumaczone elementy: interfejs użytkownika, etykiety metod obróbki, komunikaty błędów, produkty
-- Baza `canonical foods` przechowuje nazwy bazowe po angielsku, a UI korzysta z mapowań i18n (pl/en)
+- Mobile: i18next + react-i18next; pliki tłumaczeń przechowywane lokalnie (`pl.json`, `en.json`)
+- Web: i18next (lub analogiczne rozwiązanie kompatybilne z Astro/React); te same pliki tłumaczeń co mobile
+- Języki MVP: polski (pl) i angielski (en) — na obu platformach
+- Tłumaczone elementy: interfejs użytkownika, etykiety metod obróbki, komunikaty błędów, nazwy produktów
+- Baza `canonical foods` przechowuje nazwy bazowe po angielsku, a UI korzysta z mapowań i18n (pl/en) po stronie klienta
+- Web: język wykrywany z nagłówka `Accept-Language` przeglądarki; mobile: z ustawień systemowych urządzenia
 - Architektura gotowa na dodanie kolejnych języków przez dodanie nowego pliku JSON
 
 ---
@@ -112,7 +169,7 @@ Poza zakresem MVP (wersja 1.0):
 - Integracja z zewnętrznymi aplikacjami dietetycznymi (Fitatu, Yazio, MyFitnessPal)
 - Eksport historii obliczeń
 - Powiadomienia push
-- Wersja webowa (priorytet: aplikacja mobilna)
+- Finalny wybór web payment providera (Stripe jako domyślny kandydat; decyzja przed implementacją US-030)
 
 ---
 
@@ -122,13 +179,14 @@ Poza zakresem MVP (wersja 1.0):
 
 US-001
 Tytuł: Pierwsze obliczenie bez rejestracji (tryb produktu)
-Opis: Jako nowy użytkownik, który właśnie pobrał aplikację, chcę wykonać obliczenie w trybie produktu bez konieczności rejestracji, aby zobaczyć wartość aplikacji przed podjęciem decyzji o założeniu konta.
+Opis: Jako nowy użytkownik, który właśnie pobrał aplikację mobilną lub otworzył stronę webową, chcę wykonać obliczenie w trybie produktu bez konieczności rejestracji, aby zobaczyć wartość aplikacji przed podjęciem decyzji o założeniu konta.
 Kryteria akceptacji:
 
-- Użytkownik może otworzyć aplikację i przejść bezpośrednio do trybu produktu bez żadnego ekranu rejestracji
+- Użytkownik może otworzyć aplikację (mobile) lub stronę (web) i przejść bezpośrednio do trybu produktu bez żadnego ekranu rejestracji
 - Użytkownik może wykonać co najmniej 1 pełne obliczenie (wybór produktu, gramatura, metoda obróbki, wynik) bez zakładania konta
 - Aplikacja nie wymaga podania e-maila ani żadnych danych osobowych przed pierwszym obliczeniem
 - Po wykonaniu 1–2 obliczeń aplikacja wyświetla subtelną zachętę do rejestracji (nie blokuje dalszego przeglądania, ale sygnalizuje limit)
+- Limit anonimowy egzekwowany przez localStorage — działa identycznie na mobile i na web
 
 US-002
 Tytuł: Trial trybu AI przed rejestracją
@@ -296,7 +354,8 @@ Kryteria akceptacji:
 
 - Zalogowany użytkownik Free, który wyczerpał trial AI, widzi przy próbie użycia trybu AI ekran/modal upsell
 - Ekran upsell zawiera opis korzyści Premium i przycisk „Przejdź na Premium"
-- Przycisk „Przejdź na Premium" otwiera flow zakupu subskrypcji przez RevenueCat
+- **Mobile**: przycisk „Przejdź na Premium" otwiera flow zakupu subskrypcji przez RevenueCat (natywny IAP)
+- **Web**: przycisk „Przejdź na Premium" otwiera flow zakupu przez Stripe (web payment)
 - Użytkownik może zamknąć ekran upsell i wrócić do trybu produktu
 
 ### Historia obliczeń
@@ -325,14 +384,14 @@ Kryteria akceptacji:
 ### Monetyzacja i subskrypcje
 
 US-019
-Tytuł: Zakup subskrypcji Premium
-Opis: Jako użytkownik Free, chcę kupić subskrypcję Premium przez App Store lub Google Play, aby uzyskać nieograniczony dostęp do trybu dania z AI.
+Tytuł: Zakup subskrypcji Premium przez mobile
+Opis: Jako użytkownik Free na iOS lub Androidzie, chcę kupić subskrypcję Premium przez App Store lub Google Play, aby uzyskać nieograniczony dostęp do trybu dania z AI.
 Kryteria akceptacji:
 
 - Flow zakupu subskrypcji obsługiwany przez RevenueCat
 - Użytkownik może wybrać subskrypcję (miesięczna / roczna – opcje do ustalenia) i przejść przez natywny proces płatności App Store / Google Play
 - Po pomyślnym zakupie flaga `is_premium` w Supabase jest aktualizowana przez webhook RevenueCat
-- Użytkownik bez ponownego logowania uzyskuje dostęp do trybu AI
+- Użytkownik bez ponownego logowania uzyskuje dostęp do trybu AI (na mobile i na web)
 - W przypadku niepowodzenia płatności aplikacja wyświetla stosowny komunikat
 
 US-020
@@ -350,10 +409,34 @@ Tytuł: Utrata dostępu po wygaśnięciu subskrypcji
 Opis: Jako użytkownik Premium, którego subskrypcja wygasła, chcę zobaczyć jasny komunikat o utracie dostępu do trybu AI, aby wiedzieć, że muszę odnowić subskrypcję.
 Kryteria akceptacji:
 
-- Po wygaśnięciu subskrypcji webhook RevenueCat aktualizuje flagę `is_premium` na false w Supabase
-- Przy próbie użycia trybu AI użytkownik widzi komunikat o wygaśnięciu subskrypcji i przycisk odnowienia
+- Po wygaśnięciu subskrypcji webhook (RevenueCat lub Stripe) aktualizuje flagę `is_premium` na false w Supabase
+- Przy próbie użycia trybu AI użytkownik widzi komunikat o wygaśnięciu subskrypcji i przycisk odnowienia (na mobile: IAP, na web: Stripe)
 - Użytkownik zachowuje dostęp do trybu produktu (Free) i historii obliczeń
 - Historia obliczeń z okresu Premium jest nadal dostępna
+
+### Monetyzacja webowa
+
+US-030
+Tytuł: Zakup subskrypcji Premium przez web
+Opis: Jako użytkownik Free korzystający z aplikacji webowej, chcę kupić subskrypcję Premium przez stronę, aby uzyskać nieograniczony dostęp do trybu dania z AI bez potrzeby instalowania aplikacji mobilnej.
+Kryteria akceptacji:
+
+- Flow zakupu subskrypcji na web obsługiwany przez Stripe (lub wybrany web payment provider)
+- Użytkownik może wybrać subskrypcję (miesięczna / roczna) i przejść przez Stripe Checkout
+- Po pomyślnym zakupie webhook Stripe aktualizuje flagę `is_premium` w Supabase (ta sama flaga co dla IAP)
+- Użytkownik bez ponownego logowania uzyskuje dostęp do trybu AI — zarówno na web, jak i na mobile
+- W przypadku niepowodzenia płatności strona wyświetla stosowny komunikat
+- Webhook Stripe weryfikowany przez podpisany sekret (Stripe webhook signature) przed aktualizacją danych
+
+US-031
+Tytuł: Cross-platform dostęp Premium (mobile ↔ web)
+Opis: Jako użytkownik, który kupił subskrypcję Premium na jednej platformie (mobile lub web), chcę mieć automatyczny dostęp do trybu AI również na drugiej platformie, bez dodatkowych kroków.
+Kryteria akceptacji:
+
+- Subskrypcja zakupiona przez RevenueCat (mobile) jest honorowana na web — użytkownik loguje się tym samym e-mailem i ma pełny dostęp AI
+- Subskrypcja zakupiona przez Stripe (web) jest honorowana na mobile — po zalogowaniu tym samym kontem użytkownik ma pełny dostęp AI
+- Obie platformy czytają flagę `is_premium` z tabeli `profiles` w Supabase na podstawie JWT `user_id`
+- Nie jest wymagane żadne dodatkowe działanie użytkownika po zalogowaniu — dostęp jest natychmiastowy
 
 ### Bezpieczeństwo i limity
 
@@ -450,12 +533,13 @@ Kryteria akceptacji:
 
 | Metryka                         | Cel / Próg                                                                                                    |
 | ------------------------------- | ------------------------------------------------------------------------------------------------------------- |
-| Czas do wyniku (tryb produktu)  | Poniżej 10 sekund od zatwierdzenia danych wejściowych do wyświetlenia wyniku                                  |
+| Czas do wyniku (tryb produktu)  | Poniżej 10 sekund od zatwierdzenia danych wejściowych do wyświetlenia wyniku (mobile i web)                   |
 | Błąd estymacji makro po obróbce | Poniżej 10–15% odchylenia vs. wartości referencyjne USDA (metodologia pomiaru do ustalenia)                   |
-| Retencja tygodniowa             | Użytkownik powraca do aplikacji co najmniej kilka razy w tygodniu                                             |
+| Retencja tygodniowa             | Użytkownik powraca do aplikacji co najmniej kilka razy w tygodniu (mierzone łącznie dla mobile i web)         |
 | Walidacja funkcji AI            | Tryb dania z AI realnie upraszcza liczenie kalorii dla złożonych posiłków (ocena jakościowa + metryki użycia) |
 | Konwersja trial → rejestracja   | Do ustalenia po zebraniu pierwszych danych; punkt bazowy w pierwszym miesiącu po launchu                      |
-| Konwersja Free → Premium        | Do ustalenia po zebraniu pierwszych danych; śledzony przez RevenueCat                                         |
+| Konwersja Free → Premium        | Do ustalenia po zebraniu pierwszych danych; śledzony przez RevenueCat (mobile) i Stripe (web)                 |
 | Wskaźnik błędów wywołań AI      | Poniżej 5% wywołań kończących się błędem (timeout, błąd parsowania, nierozpoznane danie)                      |
 | Czas odpowiedzi AI              | Mediana poniżej 5 sekund dla wywołania LLM (od wysłania do odebrania wyniku)                                  |
 | Nadużycia limitu IP             | Mniej niż 1% unikalnych IP blokowanych dziennie przez limit abuse (wskaźnik kalibracji limitu)                |
+| Split platform                  | Stosunek sesji mobile vs web — do obserwacji po launchu; nie ma celu w MVP                                    |
