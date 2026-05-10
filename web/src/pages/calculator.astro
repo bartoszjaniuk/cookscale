@@ -5,16 +5,20 @@ import Footer from "@/components/Footer.astro";
 import { ProductCalculator } from "@/components/product-calculator";
 
 const pathname = Astro.url.pathname;
+const { user } = Astro.locals;
 ---
 
 <BaseLayout
 	title="Kalkulator — CookScale"
 	description="Przelicz gramaturę i makro produktów surowych po obróbce termicznej."
 >
-	<Header currentPath={pathname} />
+	<Header currentPath={pathname} user={user} />
 	<main class="max-w-6xl mx-auto px-5 md:px-8 py-8 md:py-16">
 		<div class="max-w-2xl">
-			<p class="text-[13px] uppercase tracking-widest" style="color: var(--color-muted-foreground)">
+			<p
+				class="text-[13px] uppercase tracking-widest"
+				style="color: var(--color-muted-foreground)"
+			>
 				Tryb produktu
 			</p>
 			<h1 class="mt-2 md:mt-3">Surowe ↔ Po obróbce.</h1>
@@ -22,8 +26,8 @@ const pathname = Astro.url.pathname;
 				class="mt-3 md:mt-4 text-[15px] md:text-[16px]"
 				style="color: var(--color-muted-foreground)"
 			>
-				Wybierz produkt z bazy, podaj gramaturę i metodę. Włącz tryb odwrotny, jeśli ważysz po
-				ugotowaniu.
+				Wybierz produkt z bazy, podaj gramaturę i metodę. Włącz tryb odwrotny,
+				jeśli ważysz po ugotowaniu.
 			</p>
 		</div>
 		<div class="mt-8 md:mt-10">

@@ -7,7 +7,10 @@ export function Header() {
     <Link
       to={to}
       className="text-[15px] tracking-[-0.01em] transition-colors"
-      style={{ color: pathname === to ? "var(--color-primary)" : "var(--color-foreground)" }}
+      style={{
+        color:
+          pathname === to ? "var(--color-primary)" : "var(--color-foreground)",
+      }}
     >
       {label}
     </Link>
@@ -16,12 +19,18 @@ export function Header() {
   return (
     <header
       className="sticky top-0 z-40 backdrop-blur"
-      style={{ background: "color-mix(in oklab, var(--color-background) 80%, transparent)" }}
+      style={{
+        background:
+          "color-mix(in oklab, var(--color-background) 80%, transparent)",
+      }}
     >
       <div className="max-w-6xl mx-auto px-5 md:px-8 h-16 flex items-center justify-between">
         <Link to="/" className="flex items-baseline">
           <span className="font-serif text-[26px] leading-none">CookScale</span>
-          <span className="text-[26px] leading-none" style={{ color: "var(--color-primary)" }}>
+          <span
+            className="text-[26px] leading-none"
+            style={{ color: "var(--color-primary)" }}
+          >
             .
           </span>
         </Link>
@@ -33,7 +42,10 @@ export function Header() {
         </nav>
         <div className="flex items-center gap-3">
           <ThemeToggle />
-          <Link to="/login" className="btn-ghost hidden sm:inline-flex !py-2.5 !px-5 !text-[14px]">
+          <Link
+            to="/login"
+            className="btn-ghost hidden sm:inline-flex !py-2.5 !px-5 !text-[14px]"
+          >
             Zaloguj
           </Link>
           <Link to="/login" className="btn-primary !py-2.5 !px-5 !text-[14px]">
@@ -52,7 +64,10 @@ export function Footer() {
         <div>
           <div className="flex items-baseline">
             <span className="font-serif text-[28px]">CookScale</span>
-            <span className="text-[28px]" style={{ color: "var(--color-primary)" }}>
+            <span
+              className="text-[28px]"
+              style={{ color: "var(--color-primary)" }}
+            >
               .
             </span>
           </div>

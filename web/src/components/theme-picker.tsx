@@ -21,7 +21,8 @@ export function ThemePicker() {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    const saved = (localStorage.getItem(COLOR_KEY) as ColorTheme | null) ?? "emerald";
+    const saved =
+      (localStorage.getItem(COLOR_KEY) as ColorTheme | null) ?? "emerald";
     setActive(saved);
     applyColorTheme(saved);
     setMounted(true);
@@ -40,7 +41,10 @@ export function ThemePicker() {
   return (
     <div
       className="inline-flex items-center gap-1 p-1 rounded-full"
-      style={{ border: "1px solid var(--color-border)", background: "var(--color-card)" }}
+      style={{
+        border: "1px solid var(--color-border)",
+        background: "var(--color-card)",
+      }}
       role="group"
       aria-label="Motyw kolorystyczny"
     >
@@ -57,7 +61,9 @@ export function ThemePicker() {
             className="w-6 h-6 rounded-full transition-all"
             style={{
               background: swatch,
-              outline: isActive ? `2px solid ${swatch}` : "2px solid transparent",
+              outline: isActive
+                ? `2px solid ${swatch}`
+                : "2px solid transparent",
               outlineOffset: "2px",
               transform: isActive ? "scale(1.15)" : "scale(1)",
             }}

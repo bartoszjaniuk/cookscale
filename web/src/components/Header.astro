@@ -1,11 +1,13 @@
 ---
 import { ThemeToggle } from "@/components/theme-toggle";
+import type { User } from "@supabase/supabase-js";
 
 interface Props {
 	currentPath: string;
+	user?: User | null;
 }
 
-const { currentPath } = Astro.props;
+const { currentPath, user = null } = Astro.props;
 
 const navLinks = [
 	{ href: "/", label: "Start" },
@@ -19,10 +21,14 @@ const navLinks = [
 	class="sticky top-0 z-40 backdrop-blur"
 	style="background: color-mix(in oklab, var(--color-background) 80%, transparent)"
 >
-	<div class="max-w-6xl mx-auto px-5 md:px-8 h-16 flex items-center justify-between">
+	<div
+		class="max-w-6xl mx-auto px-5 md:px-8 h-16 flex items-center justify-between"
+	>
 		<a href="/" class="flex items-baseline">
 			<span class="font-serif text-[26px] leading-none">CookScale</span>
-			<span class="text-[26px] leading-none" style="color: var(--color-primary)">.</span>
+			<span class="text-[26px] leading-none" style="color: var(--color-primary)"
+				>.</span
+			>
 		</a>
 
 		<!-- Desktop nav -->
@@ -47,11 +53,31 @@ const navLinks = [
 		<!-- Right side -->
 		<div class="flex items-center gap-3">
 			<ThemeToggle client:load />
-			<a href="/login" class="btn-ghost hidden sm:inline-flex !py-2.5 !px-5 !text-[14px]">Zaloguj</a
-			>
-			<a href="/login" class="btn-primary hidden sm:inline-flex !py-2.5 !px-5 !text-[14px]"
-				>Rejestracja</a
-			>
+			{
+				user ? (
+					<a
+						href="/api/logout"
+						class="btn-ghost hidden sm:inline-flex !py-2.5 !px-5 !text-[14px]"
+					>
+						Wyloguj
+					</a>
+				) : (
+					<>
+						<a
+							href="/login"
+							class="btn-ghost hidden sm:inline-flex !py-2.5 !px-5 !text-[14px]"
+						>
+							Zaloguj
+						</a>
+						<a
+							href="/login"
+							class="btn-primary hidden sm:inline-flex !py-2.5 !px-5 !text-[14px]"
+						>
+							Rejestracja
+						</a>
+					</>
+				)
+			}
 
 			<!-- Hamburger (mobile only) -->
 			<button
@@ -74,8 +100,11 @@ const navLinks = [
 					stroke-linecap="round"
 					stroke-linejoin="round"
 				>
-					<line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"
-					></line><line x1="3" y1="18" x2="21" y2="18"></line>
+					<line x1="3" y1="6" x2="21" y2="6"></line><line
+						x1="3"
+						y1="12"
+						x2="21"
+						y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line>
 				</svg>
 				<svg
 					id="icon-close"
@@ -89,7 +118,11 @@ const navLinks = [
 					stroke-linecap="round"
 					stroke-linejoin="round"
 				>
-					<line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line>
+					<line x1="18" y1="6" x2="6" y2="18"></line><line
+						x1="6"
+						y1="6"
+						x2="18"
+						y2="18"></line>
 				</svg>
 			</button>
 		</div>
@@ -117,11 +150,35 @@ const navLinks = [
 					</a>
 				))
 			}
-			<div class="flex gap-3 pt-3 mt-1 border-t" style="border-color: var(--color-border)">
-				<a href="/login" class="btn-ghost !py-2.5 !px-5 !text-[14px] flex-1 text-center">Zaloguj</a>
-				<a href="/login" class="btn-primary !py-2.5 !px-5 !text-[14px] flex-1 text-center"
-					>Rejestracja</a
-				>
+			<div
+				class="flex gap-3 pt-3 mt-1 border-t"
+				style="border-color: var(--color-border)"
+			>
+				{
+					user ? (
+						<a
+							href="/api/logout"
+							class="btn-ghost !py-2.5 !px-5 !text-[14px] flex-1 text-center"
+						>
+							Wyloguj
+						</a>
+					) : (
+						<>
+							<a
+								href="/login"
+								class="btn-ghost !py-2.5 !px-5 !text-[14px] flex-1 text-center"
+							>
+								Zaloguj
+							</a>
+							<a
+								href="/login"
+								class="btn-primary !py-2.5 !px-5 !text-[14px] flex-1 text-center"
+							>
+								Rejestracja
+							</a>
+						</>
+					)
+				}
 			</div>
 		</nav>
 	</div>

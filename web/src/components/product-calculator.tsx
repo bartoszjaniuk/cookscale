@@ -51,7 +51,10 @@ export function ProductCalculator() {
 
         <div className="mt-4 flex flex-wrap gap-2 max-h-36 md:max-h-44 overflow-y-auto pr-1">
           {filtered.length === 0 ? (
-            <p className="text-[14px] py-2" style={{ color: "var(--color-muted-foreground)" }}>
+            <p
+              className="text-[14px] py-2"
+              style={{ color: "var(--color-muted-foreground)" }}
+            >
               Brak wyników. Spróbuj innej nazwy.
             </p>
           ) : (
@@ -70,7 +73,10 @@ export function ProductCalculator() {
 
         <div className="mt-10">
           <div className="flex items-center justify-between mb-3">
-            <label className="text-[14px]" style={{ color: "var(--color-muted-foreground)" }}>
+            <label
+              className="text-[14px]"
+              style={{ color: "var(--color-muted-foreground)" }}
+            >
               Metoda obróbki
             </label>
             <button
@@ -111,7 +117,10 @@ export function ProductCalculator() {
             onChange={(e) => setGrams(e.target.value)}
           />
           {results.error && (
-            <p className="mt-2 text-[13px]" style={{ color: "var(--color-destructive)" }}>
+            <p
+              className="mt-2 text-[13px]"
+              style={{ color: "var(--color-destructive)" }}
+            >
               {results.error}
             </p>
           )}
@@ -132,7 +141,10 @@ export function ProductCalculator() {
           </div>
           <span
             className="text-[12px] px-3 py-1 rounded-full"
-            style={{ background: "var(--color-primary-light)", color: "var(--color-primary)" }}
+            style={{
+              background: "var(--color-primary-light)",
+              color: "var(--color-primary)",
+            }}
           >
             {METHOD_LABEL[method].pl}
           </span>
@@ -153,10 +165,16 @@ export function ProductCalculator() {
         </div>
 
         <div className="mt-6 grid grid-cols-2 gap-x-6 gap-y-4">
-          <p className="text-[13px]" style={{ color: "var(--color-muted-foreground)" }}>
+          <p
+            className="text-[13px]"
+            style={{ color: "var(--color-muted-foreground)" }}
+          >
             Na 100g surowego
           </p>
-          <p className="text-[13px]" style={{ color: "var(--color-muted-foreground)" }}>
+          <p
+            className="text-[13px]"
+            style={{ color: "var(--color-muted-foreground)" }}
+          >
             Na porcję (surowo)
           </p>
           <MacroRow
@@ -212,7 +230,9 @@ function Tile({
     <div
       className="rounded-2xl p-5"
       style={{
-        background: highlight ? "var(--color-primary-light)" : "var(--color-primary-muted)",
+        background: highlight
+          ? "var(--color-primary-light)"
+          : "var(--color-primary-muted)",
       }}
     >
       <p
@@ -223,7 +243,9 @@ function Tile({
       </p>
       <p
         className={`font-serif mt-2 ${big ? "text-[32px]" : "text-[22px]"}`}
-        style={{ color: highlight ? "var(--color-primary)" : "var(--color-foreground)" }}
+        style={{
+          color: highlight ? "var(--color-primary)" : "var(--color-foreground)",
+        }}
       >
         {value}
       </p>
@@ -245,7 +267,10 @@ function MacroRow({
   return (
     <>
       <div className="flex items-baseline justify-between border-b border-[var(--color-border)] pb-2">
-        <span className="text-[14px]" style={{ color: "var(--color-muted-foreground)" }}>
+        <span
+          className="text-[14px]"
+          style={{ color: "var(--color-muted-foreground)" }}
+        >
           {label}
         </span>
         <span className="text-[15px]">
@@ -253,7 +278,10 @@ function MacroRow({
         </span>
       </div>
       <div className="flex items-baseline justify-between border-b border-[var(--color-border)] pb-2">
-        <span className="text-[14px]" style={{ color: "var(--color-muted-foreground)" }}>
+        <span
+          className="text-[14px]"
+          style={{ color: "var(--color-muted-foreground)" }}
+        >
           {label}
         </span>
         <span className="text-[15px] font-medium">
@@ -264,7 +292,12 @@ function MacroRow({
   );
 }
 
-function compute(food: Food | null, method: Method, gramsStr: string, reverse: boolean) {
+function compute(
+  food: Food | null,
+  method: Method,
+  gramsStr: string,
+  reverse: boolean,
+) {
   const g = Number(gramsStr);
   if (!food) {
     return blank("Wybierz produkt.");

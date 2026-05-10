@@ -5,6 +5,7 @@ import Footer from "@/components/Footer.astro";
 import { LoginForm } from "@/components/login-form";
 
 const pathname = Astro.url.pathname;
+const { user } = Astro.locals;
 ---
 
 <BaseLayout
@@ -14,7 +15,7 @@ const pathname = Astro.url.pathname;
 	ogTitle="Zaloguj się — CookScale"
 	ogDescription="Twoja historia makro w jednym miejscu."
 >
-	<Header currentPath={pathname} />
+	<Header currentPath={pathname} user={user} />
 	<main class="max-w-6xl mx-auto px-5 md:px-8 py-8 md:py-20">
 		<div class="grid lg:grid-cols-2 gap-8 lg:gap-20 items-center">
 			<!-- Left — editorial copy -->
@@ -28,11 +29,17 @@ const pathname = Astro.url.pathname;
 				<h1 class="mt-4">
 					Twoje makro, <em class="italic font-light">w jednym miejscu.</em>
 				</h1>
-				<p class="mt-6 text-[17px] max-w-md" style="color: var(--color-muted-foreground)">
-					Zaloguj się, aby zsynchronizować historię obliczeń, ulubione produkty i własne yieldy
-					między urządzeniami.
+				<p
+					class="mt-6 text-[17px] max-w-md"
+					style="color: var(--color-muted-foreground)"
+				>
+					Zaloguj się, aby zsynchronizować historię obliczeń, ulubione produkty
+					i własne yieldy między urządzeniami.
 				</p>
-				<ul class="mt-10 space-y-4 text-[15px]" style="color: var(--color-muted-foreground)">
+				<ul
+					class="mt-10 space-y-4 text-[15px]"
+					style="color: var(--color-muted-foreground)"
+				>
 					{
 						[
 							"Synchronizacja historii w chmurze",
@@ -40,7 +47,10 @@ const pathname = Astro.url.pathname;
 							"Bez reklam, bez śledzenia",
 						].map((t) => (
 							<li class="flex items-center gap-3">
-								<span class="w-1.5 h-1.5 rounded-full" style="background: var(--color-primary)" />
+								<span
+									class="w-1.5 h-1.5 rounded-full"
+									style="background: var(--color-primary)"
+								/>
 								{t}
 							</li>
 						))

@@ -337,7 +337,11 @@
 /* Dark-mode adapters for utility classes hardcoded in components */
 .dark .bg-white,
 .dark .bg-white\/80 {
-  background-color: color-mix(in oklab, var(--card) 92%, transparent) !important;
+  background-color: color-mix(
+    in oklab,
+    var(--card) 92%,
+    transparent
+  ) !important;
 }
 .dark .text-black {
   color: var(--foreground) !important;

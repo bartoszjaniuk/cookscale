@@ -36,7 +36,9 @@ export function ThemeToggle() {
     <button
       type="button"
       onClick={toggle}
-      aria-label={theme === "light" ? "Przełącz na tryb ciemny" : "Przełącz na tryb jasny"}
+      aria-label={
+        theme === "light" ? "Przełącz na tryb ciemny" : "Przełącz na tryb jasny"
+      }
       className="grid place-items-center w-9 h-9 rounded-lg border transition-colors"
       style={{
         color: "var(--color-foreground)",

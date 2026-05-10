@@ -20,7 +20,7 @@ export const GET: APIRoute = () => {
     <lastmod>${now}</lastmod>
     <changefreq>${p.changefreq}</changefreq>
     <priority>${p.priority}</priority>
-  </url>`
+  </url>`,
     )
     .join("\n");
 

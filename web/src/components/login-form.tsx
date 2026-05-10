@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { createSupabaseClient } from "@/lib/supabase";
+import { createSupabaseBrowserClient } from "@/lib/supabase";
 
 export function LoginForm() {
   const [email, setEmail] = useState("");
@@ -17,8 +17,11 @@ export function LoginForm() {
     setInfo(null);
     setIsError(false);
 
-    const supabase = createSupabaseClient();
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const supabase = createSupabaseBrowserClient();
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
 
     setSubmitting(false);
 
@@ -32,7 +35,7 @@ export function LoginForm() {
   };
 
   const loginWithGoogle = async () => {
-    const supabase = createSupabaseClient();
+    const supabase = createSupabaseBrowserClient();
     await supabase.auth.signInWithOAuth({
       provider: "google",
       options: { redirectTo: `${window.location.origin}/history` },
@@ -43,7 +46,9 @@ export function LoginForm() {
     <div className="card-soft p-7 md:p-10 max-w-md w-full mx-auto">
       <div className="flex items-baseline">
         <span className="font-serif text-[28px]">CookScale</span>
-        <span className="text-[28px]" style={{ color: "var(--color-primary)" }}>.</span>
+        <span className="text-[28px]" style={{ color: "var(--color-primary)" }}>
+          .
+        </span>
       </div>
       <h2 className="font-serif text-[28px] mt-6">Zaloguj się</h2>
       <p className="mt-2 text-[14px] text-black/60">
@@ -72,9 +77,17 @@ export function LoginForm() {
       </button>
 
       <div className="my-6 flex items-center gap-3">
-        <span className="h-px flex-1" style={{ background: "var(--color-border)" }} />
-        <span className="text-[12px] uppercase tracking-widest text-black/45">lub</span>
-        <span className="h-px flex-1" style={{ background: "var(--color-border)" }} />
+        <span
+          className="h-px flex-1"
+          style={{ background: "var(--color-border)" }}
+        />
+        <span className="text-[12px] uppercase tracking-widest text-black/45">
+          lub
+        </span>
+        <span
+          className="h-px flex-1"
+          style={{ background: "var(--color-border)" }}
+        />
       </div>
 
       <form onSubmit={submit} className="space-y-6">
@@ -103,7 +116,7 @@ export function LoginForm() {
               style={{ color: "var(--color-primary)" }}
               onClick={() =>
                 setInfo(
-                  "Wpisz swój e-mail i kliknij 'Zapomniałeś?' — link do resetu zostanie wysłany."
+                  "Wpisz swój e-mail i kliknij 'Zapomniałeś?' — link do resetu zostanie wysłany.",
                 )
               }
             >
@@ -136,7 +149,9 @@ export function LoginForm() {
               background: isError
                 ? "var(--color-destructive)"
                 : "var(--color-announcement)",
-              color: isError ? "var(--color-destructive-foreground)" : undefined,
+              color: isError
+                ? "var(--color-destructive-foreground)"
+                : undefined,
             }}
           >
             {info}

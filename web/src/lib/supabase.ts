@@ -1,36 +1,44 @@
-import { createClient } from "@supabase/supabase-js";
+import {
+  createBrowserClient,
+  createServerClient,
+  parseCookieHeader,
+} from "@supabase/ssr";
+import type { AstroCookies } from "astro";
 
 const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL as string;
 const supabaseAnonKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY as string;
 
 if (!supabaseUrl || !supabaseAnonKey) {
   throw new Error(
-    "Missing Supabase environment variables: PUBLIC_SUPABASE_URL and PUBLIC_SUPABASE_ANON_KEY must be set."
+    "Missing Supabase environment variables: PUBLIC_SUPABASE_URL and PUBLIC_SUPABASE_ANON_KEY must be set.",
   );
 }
 
-// Singleton for browser-side usage
-let browserClient: ReturnType<typeof createClient> | null = null;
+/**
+ * Browser-side client — stores session in cookies so the server can read it.
+ * Use in React components (client:load / client:only).
+ */
+export const createSupabaseBrowserClient = () =>
+  createBrowserClient(supabaseUrl, supabaseAnonKey);
 
-export function createSupabaseClient() {
-  if (typeof window !== "undefined") {
-    browserClient ??= createClient(supabaseUrl, supabaseAnonKey);
-    return browserClient;
-  }
-  return createClient(supabaseUrl, supabaseAnonKey);
-}
-
-// Server-side client using the service role key (only available in server context)
-export function createSupabaseServerClient() {
-  const serviceRoleKey = import.meta.env.SUPABASE_SERVICE_ROLE_KEY as string | undefined;
-
-  if (!serviceRoleKey) {
-    throw new Error(
-      "Missing SUPABASE_SERVICE_ROLE_KEY. This function must only be called in server-side code."
-    );
-  }
-
-  return createClient(supabaseUrl, serviceRoleKey, {
-    auth: { persistSession: false },
+/**
+ * Server-side client — reads session from request cookies, writes refreshed
+ * tokens back to response cookies via Astro's cookies API.
+ * Use in Astro pages (.astro frontmatter) and middleware.
+ */
+export const createSupabaseServerClient = (context: {
+  request: Request;
+  cookies: AstroCookies;
+}) =>
+  createServerClient(supabaseUrl, supabaseAnonKey, {
+    cookies: {
+      getAll() {
+        return parseCookieHeader(context.request.headers.get("Cookie") ?? "");
+      },
+      setAll(cookiesToSet) {
+        cookiesToSet.forEach(({ name, value, options }) =>
+          context.cookies.set(name, value, options),
+        );
+      },
+    },
   });
-}

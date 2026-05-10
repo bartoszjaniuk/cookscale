@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { FOODS, macrosForGrams, r1, type Method } from "@/lib/cookscale-data";
 
 const MAX = 200;
@@ -15,7 +15,11 @@ export function AiCalculator() {
 
   const left = MAX - text.length;
   const counterColor =
-    left < 20 ? "var(--color-destructive)" : left < 40 ? "var(--color-warning)" : "rgba(0,0,0,0.5)";
+    left < 20
+      ? "var(--color-destructive)"
+      : left < 40
+        ? "var(--color-warning)"
+        : "rgba(0,0,0,0.5)";
 
   const submit = async () => {
     if (text.trim().length === 0 || text.length > MAX) return;
@@ -33,7 +37,10 @@ export function AiCalculator() {
 
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        setError((data as { error?: string }).error ?? "Błąd serwera. Spróbuj ponownie.");
+        setError(
+          (data as { error?: string }).error ??
+            "Błąd serwera. Spróbuj ponownie.",
+        );
         return;
       }
 
@@ -58,7 +65,10 @@ export function AiCalculator() {
           className="w-full text-[16px] leading-relaxed bg-transparent outline-none resize-none border-b border-[var(--color-border)] focus:border-[var(--color-primary)] pb-3"
         />
         <div className="flex items-center justify-between mt-4 gap-3">
-          <span className="text-[13px] shrink-0" style={{ color: counterColor }}>
+          <span
+            className="text-[13px] shrink-0"
+            style={{ color: counterColor }}
+          >
             {text.length}/{MAX}
           </span>
           <button
@@ -92,7 +102,10 @@ export function AiCalculator() {
             >
               Całe danie
             </p>
-            <p className="font-serif text-[40px] mt-2" style={{ color: "var(--color-primary)" }}>
+            <p
+              className="font-serif text-[40px] mt-2"
+              style={{ color: "var(--color-primary)" }}
+            >
               {r1(result.totalGrams)} g
             </p>
             <div className="mt-6 grid grid-cols-2 gap-x-6 gap-y-3">
@@ -109,7 +122,9 @@ export function AiCalculator() {
             >
               Na 100g dania
             </p>
-            <p className="font-serif text-[40px] mt-2">{r1(result.per100.kcal)} kcal</p>
+            <p className="font-serif text-[40px] mt-2">
+              {r1(result.per100.kcal)} kcal
+            </p>
             <div className="mt-6 grid grid-cols-2 gap-x-6 gap-y-3">
               <Row label="Białko" v={`${r1(result.per100.protein)} g`} />
               <Row label="Tłuszcze" v={`${r1(result.per100.fat)} g`} />
@@ -119,7 +134,9 @@ export function AiCalculator() {
           </div>
 
           <div className="md:col-span-2">
-            <h4 className="font-serif text-[22px] mb-4">Rozpoznane składniki</h4>
+            <h4 className="font-serif text-[22px] mb-4">
+              Rozpoznane składniki
+            </h4>
             <ul className="space-y-2">
               {result.items.map((it, i) => (
                 <li
@@ -128,8 +145,12 @@ export function AiCalculator() {
                 >
                   <div>
                     <p className="text-[15px]">{it.name}</p>
-                    <p className="text-[12px]" style={{ color: "var(--color-muted-foreground)" }}>
-                      {it.grams} g · {it.method ? methodPL(it.method) : "surowe"}
+                    <p
+                      className="text-[12px]"
+                      style={{ color: "var(--color-muted-foreground)" }}
+                    >
+                      {it.grams} g ·{" "}
+                      {it.method ? methodPL(it.method) : "surowe"}
                     </p>
                   </div>
                   <p className="text-[14px]">{r1(it.macros.kcal)} kcal</p>
@@ -141,7 +162,8 @@ export function AiCalculator() {
                 className="mt-4 rounded-2xl px-5 py-4 text-[14px]"
                 style={{ background: "var(--color-announcement)" }}
               >
-                ⚠️ Nie rozpoznano: <strong>{result.unrecognized.join(", ")}</strong>. Wynik
+                ⚠️ Nie rozpoznano:{" "}
+                <strong>{result.unrecognized.join(", ")}</strong>. Wynik
                 częściowy.
               </div>
             )}
@@ -155,7 +177,10 @@ export function AiCalculator() {
 function Row({ label, v }: { label: string; v: string }) {
   return (
     <div className="flex justify-between border-b border-[var(--color-border)] pb-2">
-      <span className="text-[14px]" style={{ color: "var(--color-muted-foreground)" }}>
+      <span
+        className="text-[14px]"
+        style={{ color: "var(--color-muted-foreground)" }}
+      >
         {label}
       </span>
       <span className="text-[15px] font-medium">{v}</span>
@@ -186,7 +211,11 @@ function mockEstimate(input: string) {
   for (const part of parts) {
     const gramsMatch = part.match(/(\d+(?:[.,]\d+)?)\s*g/);
     const tbspMatch = !gramsMatch && /łyżka|łyżk/.test(part);
-    const grams = gramsMatch ? Number(gramsMatch[1].replace(",", ".")) : tbspMatch ? 12 : 0;
+    const grams = gramsMatch
+      ? Number(gramsMatch[1].replace(",", "."))
+      : tbspMatch
+        ? 12
+        : 0;
 
     const method: Method | null = /piecz|pieczone/.test(part)
       ? "baking"
@@ -197,7 +226,9 @@ function mockEstimate(input: string) {
           : null;
 
     const food = FOODS.find(
-      (f) => part.includes(f.pl.toLowerCase()) || part.includes(f.name.toLowerCase()),
+      (f) =>
+        part.includes(f.pl.toLowerCase()) ||
+        part.includes(f.name.toLowerCase()),
     );
 
     if (!food || grams <= 0) {

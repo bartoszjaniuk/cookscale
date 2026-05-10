@@ -26,14 +26,19 @@ export const POST: APIRoute = async ({ request }) => {
 
   const parsed = RequestSchema.safeParse(body);
   if (!parsed.success) {
-    return new Response(JSON.stringify({ error: "Nieprawidłowe dane wejściowe." }), {
-      status: 400,
-      headers: { "Content-Type": "application/json" },
-    });
+    return new Response(
+      JSON.stringify({ error: "Nieprawidłowe dane wejściowe." }),
+      {
+        status: 400,
+        headers: { "Content-Type": "application/json" },
+      },
+    );
   }
 
   const { text } = parsed.data;
-  const openrouterKey = import.meta.env.OPENROUTER_API_KEY as string | undefined;
+  const openrouterKey = import.meta.env.OPENROUTER_API_KEY as
+    | string
+    | undefined;
 
   // Use LLM if key is present, otherwise fall back to local heuristic parser.
   const result = openrouterKey
@@ -79,7 +84,7 @@ function estimateLocally(input: string): EstimateResult {
     const food = FOODS.find(
       (f) =>
         part.includes(f.pl.toLowerCase()) ||
-        part.includes(f.name.toLowerCase())
+        part.includes(f.name.toLowerCase()),
     );
 
     if (!food || grams <= 0) {
@@ -114,7 +119,10 @@ function estimateLocally(input: string): EstimateResult {
 // ---------------------------------------------------------------------------
 // LLM-based estimation via Openrouter.ai
 // ---------------------------------------------------------------------------
-async function estimateWithLLM(input: string, apiKey: string): Promise<EstimateResult> {
+async function estimateWithLLM(
+  input: string,
+  apiKey: string,
+): Promise<EstimateResult> {
   const foodList = FOODS.map((f) => `${f.id}: ${f.pl} / ${f.name}`).join("\n");
 
   const systemPrompt = `Jesteś asystentem do analizy składników dań. Twoim zadaniem jest parsowanie tekstu i zwrócenie JSON.
@@ -128,37 +136,43 @@ Zwróć TYLKO obiekt JSON (bez markdown) w formacie:
 }
 Gdzie grams to gramatura SUROWEGO produktu wpisana przez użytkownika.`;
 
-  const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      "Authorization": `Bearer ${apiKey}`,
-      "Content-Type": "application/json",
-      "HTTP-Referer": "https://cookscale.app",
-      "X-Title": "CookScale",
+  const response = await fetch(
+    "https://openrouter.ai/api/v1/chat/completions",
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+        "HTTP-Referer": "https://cookscale.app",
+        "X-Title": "CookScale",
+      },
+      body: JSON.stringify({
+        model: "google/gemini-flash-1.5",
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: input },
+        ],
+        temperature: 0.1,
+        max_tokens: 512,
+      }),
     },
-    body: JSON.stringify({
-      model: "google/gemini-flash-1.5",
-      messages: [
-        { role: "system", content: systemPrompt },
-        { role: "user", content: input },
-      ],
-      temperature: 0.1,
-      max_tokens: 512,
-    }),
-  });
+  );
 
   if (!response.ok) {
     // Graceful fallback to local parser on LLM error
     return estimateLocally(input);
   }
 
-  const json = await response.json() as {
+  const json = (await response.json()) as {
     choices?: { message?: { content?: string } }[];
   };
 
   const content = json.choices?.[0]?.message?.content ?? "";
 
-  let parsed: { items: { foodId: string; grams: number; method: Method | null }[]; unrecognized: string[] };
+  let parsed: {
+    items: { foodId: string; grams: number; method: Method | null }[];
+    unrecognized: string[];
+  };
   try {
     parsed = JSON.parse(content);
   } catch {
@@ -172,7 +186,9 @@ Gdzie grams to gramatura SUROWEGO produktu wpisana przez użytkownika.`;
     const food = FOODS.find((f) => f.id === item.foodId);
     if (!food || item.grams <= 0) continue;
 
-    const cookedGrams = item.method ? item.grams * food.yields[item.method] : item.grams;
+    const cookedGrams = item.method
+      ? item.grams * food.yields[item.method]
+      : item.grams;
     items.push({
       name: food.pl,
       grams: Math.round(cookedGrams),
@@ -187,7 +203,10 @@ Gdzie grams to gramatura SUROWEGO produktu wpisana przez użytkownika.`;
 // ---------------------------------------------------------------------------
 // Shared aggregation logic
 // ---------------------------------------------------------------------------
-function aggregateItems(items: IngredientItem[], unrecognized: string[]): EstimateResult {
+function aggregateItems(
+  items: IngredientItem[],
+  unrecognized: string[],
+): EstimateResult {
   const total = items.reduce(
     (acc, item) => ({
       kcal: acc.kcal + item.macros.kcal,
@@ -195,7 +214,7 @@ function aggregateItems(items: IngredientItem[], unrecognized: string[]): Estima
       fat: acc.fat + item.macros.fat,
       carbs: acc.carbs + item.macros.carbs,
     }),
-    { kcal: 0, protein: 0, fat: 0, carbs: 0 }
+    { kcal: 0, protein: 0, fat: 0, carbs: 0 },
   );
 
   const totalGrams = items.reduce((acc, item) => acc + item.grams, 0);
