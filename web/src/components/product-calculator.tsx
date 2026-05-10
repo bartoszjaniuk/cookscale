@@ -212,55 +212,30 @@ function ProductCalculatorInner() {
 
         <div className="mt-7 grid grid-cols-2 gap-4">
           <Tile
-            label={reverse ? "Surowo" : "Po obróbce"}
-            value={`${r1(results.outputGrams)} g`}
-            big
-            highlight
-          />
-          <Tile
-            label={reverse ? "Po obróbce" : "Surowo"}
+            label="Surowo"
             value={`${r1(results.inputGrams)} g`}
             big
+            highlight={reverse}
+          />
+          <Tile
+            label="Po obróbce"
+            value={`${r1(results.outputGrams)} g`}
+            big
+            highlight={!reverse}
           />
         </div>
 
-        <div className="mt-6 grid grid-cols-2 gap-x-6 gap-y-4">
+        <div className="mt-6 flex flex-col gap-0">
           <p
-            className="text-[13px]"
+            className="text-[13px] mb-3"
             style={{ color: "var(--color-muted-foreground)" }}
           >
-            Na 100g surowego
+            Na porcję ({r1(results.inputGrams)}g surowych)
           </p>
-          <p
-            className="text-[13px]"
-            style={{ color: "var(--color-muted-foreground)" }}
-          >
-            Na porcję (surowo)
-          </p>
-          <MacroRow
-            label="Kalorie"
-            unit="kcal"
-            per100={results.per100.kcal}
-            portion={results.portion.kcal}
-          />
-          <MacroRow
-            label="Białko"
-            unit="g"
-            per100={results.per100.protein}
-            portion={results.portion.protein}
-          />
-          <MacroRow
-            label="Tłuszcze"
-            unit="g"
-            per100={results.per100.fat}
-            portion={results.portion.fat}
-          />
-          <MacroRow
-            label="Węglowodany"
-            unit="g"
-            per100={results.per100.carbs}
-            portion={results.portion.carbs}
-          />
+          <MacroRow label="Kalorie" unit="kcal" value={results.portion.kcal} />
+          <MacroRow label="Białko" unit="g" value={results.portion.protein} />
+          <MacroRow label="Tłuszcze" unit="g" value={results.portion.fat} />
+          <MacroRow label="Węglowodany" unit="g" value={results.portion.carbs} />
         </div>
 
         <button className="btn-primary w-full mt-8">Zapisz w historii</button>
@@ -316,39 +291,24 @@ const Tile = ({
 const MacroRow = ({
   label,
   unit,
-  per100,
-  portion,
+  value,
 }: {
   label: string;
   unit: string;
-  per100: number;
-  portion: number;
+  value: number;
 }) => {
   return (
-    <>
-      <div className="flex items-baseline justify-between border-b border-(--color-border) pb-2">
-        <span
-          className="text-[14px]"
-          style={{ color: "var(--color-muted-foreground)" }}
-        >
-          {label}
-        </span>
-        <span className="text-[15px]">
-          {r1(per100)} {unit}
-        </span>
-      </div>
-      <div className="flex items-baseline justify-between border-b border-(--color-border) pb-2">
-        <span
-          className="text-[14px]"
-          style={{ color: "var(--color-muted-foreground)" }}
-        >
-          {label}
-        </span>
-        <span className="text-[15px] font-medium">
-          {r1(portion)} {unit}
-        </span>
-      </div>
-    </>
+    <div className="flex items-baseline justify-between border-b border-(--color-border) py-2">
+      <span
+        className="text-[14px]"
+        style={{ color: "var(--color-muted-foreground)" }}
+      >
+        {label}
+      </span>
+      <span className="text-[15px] font-medium">
+        {r1(value)} {unit}
+      </span>
+    </div>
   );
 };
 
