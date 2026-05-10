@@ -1,7 +1,7 @@
 ---
 name: React Native & Expo Best Practices
 description: Performance, UI patterns, and animation conventions for React Native and Expo apps. Use when building components, optimizing lists, implementing animations, or working with navigation.
-applyTo: "src/**/*.{ts,tsx}"
+applyTo: "mobile/src/**/*.{ts,tsx}"
 ---
 
 # React Native & Expo Best Practices
