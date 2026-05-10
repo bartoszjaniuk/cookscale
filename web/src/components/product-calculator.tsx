@@ -1,36 +1,76 @@
-import {
-  type Food,
-  type Method,
-  type Macros,
-  METHOD_LABEL,
-  FOODS,
-  macrosForGrams,
-  r1,
-} from "@/lib/cookscale-data";
-import { useMemo, useState } from "react";
+import { type ProductWithFactors } from "@/api/products/products";
+import { useInitialProductsQuery } from "@/api/products/hooks/useInitialProductsQuery";
+import { useProductsSearchQuery } from "@/api/products/hooks/useProductsSearchQuery";
+import { AppProviders } from "@/providers/AppProviders";
+import { r1 } from "@/lib/cookscale-data";
+import { useEffect, useMemo, useRef, useState } from "react";
 
-const METHODS: Method[] = ["boiling", "frying", "baking"];
+const METHOD_LABEL: Record<string, string> = {
+  boiling: "Gotowanie",
+  frying: "Smażenie",
+  baking: "Pieczenie",
+};
+
+type Macros = { kcal: number; protein: number; fat: number; carbs: number };
 
 export function ProductCalculator() {
+  return (
+    <AppProviders>
+      <ProductCalculatorInner />
+    </AppProviders>
+  );
+}
+
+function ProductCalculatorInner() {
   const [query, setQuery] = useState("");
-  const [food, setFood] = useState<Food | null>(FOODS[0]);
-  const [method, setMethod] = useState<Method>("baking");
-  const [grams, setGrams] = useState<string>("150");
+  const [debouncedQuery, setDebouncedQuery] = useState("");
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [selectedProduct, setSelectedProduct] =
+    useState<ProductWithFactors | null>(null);
+  const [cookingMethodSlug, setCookingMethodSlug] = useState("");
+  const [grams, setGrams] = useState("100");
   const [reverse, setReverse] = useState(false);
 
-  const results = useMemo(
-    () => compute(food, method, grams, reverse),
-    [food, method, grams, reverse],
-  );
+  const { data: initialProducts = [] } = useInitialProductsQuery();
+  const { data: searchResults = [], isFetching: isSearching } =
+    useProductsSearchQuery(debouncedQuery);
 
-  const filtered =
-    query.length >= 2
-      ? FOODS.filter(
-          (f) =>
-            f.name.toLowerCase().includes(query.toLowerCase()) ||
-            f.pl.toLowerCase().includes(query.toLowerCase()),
-        )
-      : FOODS;
+  const handleQueryChange = (value: string) => {
+    setQuery(value);
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => setDebouncedQuery(value), 300);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
+  }, []);
+
+  const handleSelectProduct = (p: ProductWithFactors) => {
+    setSelectedProduct(p);
+    const availableSlugs = p.product_cooking_factors.map(
+      (f) => f.cooking_methods.slug,
+    );
+    if (!availableSlugs.includes(cookingMethodSlug)) {
+      setCookingMethodSlug(availableSlugs[0] ?? "");
+    }
+  };
+
+  const displayedProducts =
+    debouncedQuery.length >= 2 ? searchResults : initialProducts;
+
+  const availableMethods = selectedProduct
+    ? selectedProduct.product_cooking_factors.map((f) => ({
+        id: f.cooking_method_id,
+        slug: f.cooking_methods.slug,
+      }))
+    : [];
+
+  const results = useMemo(
+    () => compute(selectedProduct, cookingMethodSlug, grams, reverse),
+    [selectedProduct, cookingMethodSlug, grams, reverse],
+  );
 
   return (
     <div className="grid lg:grid-cols-[1.1fr_1fr] gap-6 lg:gap-12">
@@ -46,11 +86,18 @@ export function ProductCalculator() {
           className="input-search"
           placeholder="np. kurczak, ryż, brokuł…"
           value={query}
-          onChange={(e) => setQuery(e.target.value)}
+          onChange={(e) => handleQueryChange(e.target.value)}
         />
 
         <div className="mt-4 flex flex-wrap gap-2 max-h-36 md:max-h-44 overflow-y-auto pr-1">
-          {filtered.length === 0 ? (
+          {isSearching ? (
+            <p
+              className="text-[14px] py-2"
+              style={{ color: "var(--color-muted-foreground)" }}
+            >
+              Szukam…
+            </p>
+          ) : displayedProducts.length === 0 && debouncedQuery.length >= 2 ? (
             <p
               className="text-[14px] py-2"
               style={{ color: "var(--color-muted-foreground)" }}
@@ -58,14 +105,14 @@ export function ProductCalculator() {
               Brak wyników. Spróbuj innej nazwy.
             </p>
           ) : (
-            filtered.map((f) => (
+            displayedProducts.map((p) => (
               <button
-                key={f.id}
-                onClick={() => setFood(f)}
-                data-active={food?.id === f.id}
+                key={p.id}
+                onClick={() => handleSelectProduct(p)}
+                data-active={selectedProduct?.id === p.id}
                 className="pill-tab"
               >
-                {f.pl}
+                {p.name}
               </button>
             ))
           )}
@@ -87,17 +134,26 @@ export function ProductCalculator() {
               {reverse ? "← tryb standardowy" : "tryb odwrotny →"}
             </button>
           </div>
-          <div className="inline-flex w-full sm:w-auto p-1 rounded-full border border-[var(--color-border)] bg-white">
-            {METHODS.map((m) => (
-              <button
-                key={m}
-                onClick={() => setMethod(m)}
-                data-active={method === m}
-                className="pill-tab pill-tab-green !bg-transparent"
+          <div className="inline-flex w-full sm:w-auto p-1 rounded-full border border-(--color-border) bg-white">
+            {availableMethods.length === 0 ? (
+              <span
+                className="text-[13px] px-4 py-2"
+                style={{ color: "var(--color-muted-foreground)" }}
               >
-                {METHOD_LABEL[m].pl}
-              </button>
-            ))}
+                Wybierz produkt
+              </span>
+            ) : (
+              availableMethods.map((m) => (
+                <button
+                  key={m.id}
+                  onClick={() => setCookingMethodSlug(m.slug)}
+                  data-active={cookingMethodSlug === m.slug}
+                  className="pill-tab pill-tab-green bg-transparent!"
+                >
+                  {METHOD_LABEL[m.slug] ?? m.slug}
+                </button>
+              ))
+            )}
           </div>
         </div>
 
@@ -137,17 +193,21 @@ export function ProductCalculator() {
             >
               Wynik
             </p>
-            <h3 className="font-serif text-[28px] mt-1">{food?.pl ?? "—"}</h3>
+            <h3 className="font-serif text-[28px] mt-1">
+              {selectedProduct?.name ?? "—"}
+            </h3>
           </div>
-          <span
-            className="text-[12px] px-3 py-1 rounded-full"
-            style={{
-              background: "var(--color-primary-light)",
-              color: "var(--color-primary)",
-            }}
-          >
-            {METHOD_LABEL[method].pl}
-          </span>
+          {cookingMethodSlug && (
+            <span
+              className="text-[12px] px-3 py-1 rounded-full"
+              style={{
+                background: "var(--color-primary-light)",
+                color: "var(--color-primary)",
+              }}
+            >
+              {METHOD_LABEL[cookingMethodSlug] ?? cookingMethodSlug}
+            </span>
+          )}
         </div>
 
         <div className="mt-7 grid grid-cols-2 gap-4">
@@ -215,7 +275,7 @@ export function ProductCalculator() {
   );
 }
 
-function Tile({
+const Tile = ({
   label,
   value,
   big,
@@ -225,7 +285,7 @@ function Tile({
   value: string;
   big?: boolean;
   highlight?: boolean;
-}) {
+}) => {
   return (
     <div
       className="rounded-2xl p-5"
@@ -251,9 +311,9 @@ function Tile({
       </p>
     </div>
   );
-}
+};
 
-function MacroRow({
+const MacroRow = ({
   label,
   unit,
   per100,
@@ -263,10 +323,10 @@ function MacroRow({
   unit: string;
   per100: number;
   portion: number;
-}) {
+}) => {
   return (
     <>
-      <div className="flex items-baseline justify-between border-b border-[var(--color-border)] pb-2">
+      <div className="flex items-baseline justify-between border-b border-(--color-border) pb-2">
         <span
           className="text-[14px]"
           style={{ color: "var(--color-muted-foreground)" }}
@@ -277,7 +337,7 @@ function MacroRow({
           {r1(per100)} {unit}
         </span>
       </div>
-      <div className="flex items-baseline justify-between border-b border-[var(--color-border)] pb-2">
+      <div className="flex items-baseline justify-between border-b border-(--color-border) pb-2">
         <span
           className="text-[14px]"
           style={{ color: "var(--color-muted-foreground)" }}
@@ -290,30 +350,38 @@ function MacroRow({
       </div>
     </>
   );
-}
+};
 
-function compute(
-  food: Food | null,
-  method: Method,
+const compute = (
+  product: ProductWithFactors | null,
+  methodSlug: string,
   gramsStr: string,
   reverse: boolean,
-) {
+) => {
   const g = Number(gramsStr);
-  if (!food) {
-    return blank("Wybierz produkt.");
-  }
-  if (!Number.isFinite(g) || g <= 0) {
-    return blank("Podaj liczbę większą od 0.");
-  }
-  const yieldF = food.yields[method];
+  if (!product) return blank("Wybierz produkt.");
+  if (!Number.isFinite(g) || g <= 0) return blank("Podaj liczbę większą od 0.");
+
+  const factor = product.product_cooking_factors.find(
+    (f) => f.cooking_methods.slug === methodSlug,
+  );
+  if (!factor) return blank("Metoda obróbki niedostępna dla tego produktu.");
+
+  const yieldF = factor.yield_factor;
   const rawGrams = reverse ? g / yieldF : g;
   const cookedGrams = reverse ? g : g * yieldF;
-  const portion = macrosForGrams(food, rawGrams);
   const per100: Macros = {
-    kcal: food.kcal,
-    protein: food.protein,
-    fat: food.fat,
-    carbs: food.carbs,
+    kcal: product.calories_kcal ?? 0,
+    protein: product.protein_g ?? 0,
+    fat: product.fat_g ?? 0,
+    carbs: product.carbs_g ?? 0,
+  };
+  const k = rawGrams / 100;
+  const portion: Macros = {
+    kcal: per100.kcal * k,
+    protein: per100.protein * k,
+    fat: per100.fat * k,
+    carbs: per100.carbs * k,
   };
   return {
     error: null as string | null,
@@ -322,14 +390,12 @@ function compute(
     per100,
     portion,
   };
-}
+};
 
-function blank(error: string) {
-  return {
-    error,
-    inputGrams: 0,
-    outputGrams: 0,
-    per100: { kcal: 0, protein: 0, fat: 0, carbs: 0 } as Macros,
-    portion: { kcal: 0, protein: 0, fat: 0, carbs: 0 } as Macros,
-  };
-}
+const blank = (error: string) => ({
+  error,
+  inputGrams: 0,
+  outputGrams: 0,
+  per100: { kcal: 0, protein: 0, fat: 0, carbs: 0 } as Macros,
+  portion: { kcal: 0, protein: 0, fat: 0, carbs: 0 } as Macros,
+});
