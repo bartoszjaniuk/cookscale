@@ -235,7 +235,11 @@ function ProductCalculatorInner() {
           <MacroRow label="Kalorie" unit="kcal" value={results.portion.kcal} />
           <MacroRow label="Białko" unit="g" value={results.portion.protein} />
           <MacroRow label="Tłuszcze" unit="g" value={results.portion.fat} />
-          <MacroRow label="Węglowodany" unit="g" value={results.portion.carbs} />
+          <MacroRow
+            label="Węglowodany"
+            unit="g"
+            value={results.portion.carbs}
+          />
         </div>
 
         <button className="btn-primary w-full mt-8">Zapisz w historii</button>
