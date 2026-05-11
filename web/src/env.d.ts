@@ -7,6 +7,7 @@ declare global {
     interface Locals {
       user: User | null;
       supabase: SupabaseClient;
+      lang: "pl" | "en";
     }
   }
 }

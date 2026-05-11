@@ -2,37 +2,16 @@
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import Header from "@/components/Header.astro";
 import Footer from "@/components/Footer.astro";
-import { ProductCalculator } from "@/components/product-calculator";
+import { CalculatorPage } from "@/components/pages/calculator-page";
+import { getPageMeta } from "@/lib/page-meta";
 
 const pathname = Astro.url.pathname;
-const { user } = Astro.locals;
+const { user, lang } = Astro.locals;
+const meta = getPageMeta(lang, "calculator");
 ---
 
-<BaseLayout
-	title="Kalkulator — CookScale"
-	description="Przelicz gramaturę i makro produktów surowych po obróbce termicznej."
->
-	<Header currentPath={pathname} user={user} />
-	<main class="max-w-6xl mx-auto px-5 md:px-8 py-8 md:py-16">
-		<div class="max-w-2xl">
-			<p
-				class="text-[13px] uppercase tracking-widest"
-				style="color: var(--color-muted-foreground)"
-			>
-				Tryb produktu
-			</p>
-			<h1 class="mt-2 md:mt-3">Surowe ↔ Po obróbce.</h1>
-			<p
-				class="mt-3 md:mt-4 text-[15px] md:text-[16px]"
-				style="color: var(--color-muted-foreground)"
-			>
-				Wybierz produkt z bazy, podaj gramaturę i metodę. Włącz tryb odwrotny,
-				jeśli ważysz po ugotowaniu.
-			</p>
-		</div>
-		<div class="mt-8 md:mt-10">
-			<ProductCalculator client:load />
-		</div>
-	</main>
-	<Footer />
+<BaseLayout title={meta.title} description={meta.description}>
+  <Header currentPath={pathname} user={user} />
+  <CalculatorPage client:load />
+  <Footer />
 </BaseLayout>

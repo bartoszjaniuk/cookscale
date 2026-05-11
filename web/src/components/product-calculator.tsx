@@ -4,11 +4,12 @@ import { useProductsSearchQuery } from "@/api/products/hooks/useProductsSearchQu
 import { AppProviders } from "@/providers/AppProviders";
 import { r1 } from "@/lib/cookscale-data";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 
-const METHOD_LABEL: Record<string, string> = {
-  boiling: "Gotowanie",
-  frying: "Smażenie",
-  baking: "Pieczenie",
+const METHOD_LABEL_KEYS: Record<string, string> = {
+  boiling: "COOKING_METHODS.BOILING",
+  frying: "COOKING_METHODS.FRYING",
+  baking: "COOKING_METHODS.BAKING",
 };
 
 type Macros = { kcal: number; protein: number; fat: number; carbs: number };
@@ -22,6 +23,7 @@ export function ProductCalculator() {
 }
 
 function ProductCalculatorInner() {
+  const { t } = useTranslation();
   const [query, setQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -80,11 +82,11 @@ function ProductCalculatorInner() {
           className="block text-[14px] mb-2"
           style={{ color: "var(--color-muted-foreground)" }}
         >
-          Wyszukaj produkt
+          {t("CALCULATOR.SEARCH_LABEL")}
         </label>
         <input
           className="input-search"
-          placeholder="np. kurczak, ryż, brokuł…"
+          placeholder={t("CALCULATOR.SEARCH_PLACEHOLDER")}
           value={query}
           onChange={(e) => handleQueryChange(e.target.value)}
         />
@@ -95,14 +97,14 @@ function ProductCalculatorInner() {
               className="text-[14px] py-2"
               style={{ color: "var(--color-muted-foreground)" }}
             >
-              Szukam…
+              {t("CALCULATOR.SEARCHING")}
             </p>
           ) : displayedProducts.length === 0 && debouncedQuery.length >= 2 ? (
             <p
               className="text-[14px] py-2"
               style={{ color: "var(--color-muted-foreground)" }}
             >
-              Brak wyników. Spróbuj innej nazwy.
+              {t("CALCULATOR.NO_RESULTS")}
             </p>
           ) : (
             displayedProducts.map((p) => (
@@ -124,14 +126,16 @@ function ProductCalculatorInner() {
               className="text-[14px]"
               style={{ color: "var(--color-muted-foreground)" }}
             >
-              Metoda obróbki
+              {t("CALCULATOR.METHOD_LABEL")}
             </label>
             <button
               onClick={() => setReverse((v) => !v)}
               className="text-[13px] underline-offset-4 hover:underline"
               style={{ color: "var(--color-primary)" }}
             >
-              {reverse ? "← tryb standardowy" : "tryb odwrotny →"}
+              {reverse
+                ? t("CALCULATOR.STANDARD_MODE_LABEL")
+                : t("CALCULATOR.REVERSE_MODE_LABEL")}
             </button>
           </div>
           <div className="inline-flex w-full sm:w-auto p-1 rounded-full border border-(--color-border) bg-white">
@@ -140,7 +144,7 @@ function ProductCalculatorInner() {
                 className="text-[13px] px-4 py-2"
                 style={{ color: "var(--color-muted-foreground)" }}
               >
-                Wybierz produkt
+                {t("CALCULATOR.SELECT_PRODUCT")}
               </span>
             ) : (
               availableMethods.map((m) => (
@@ -150,7 +154,10 @@ function ProductCalculatorInner() {
                   data-active={cookingMethodSlug === m.slug}
                   className="pill-tab pill-tab-green bg-transparent!"
                 >
-                  {METHOD_LABEL[m.slug] ?? m.slug}
+                  {t(
+                    (METHOD_LABEL_KEYS[m.slug] as any) ??
+                      `COOKING_METHODS.${m.slug.toUpperCase()}`,
+                  )}
                 </button>
               ))
             )}
@@ -162,7 +169,9 @@ function ProductCalculatorInner() {
             className="block text-[14px] mb-1"
             style={{ color: "var(--color-muted-foreground)" }}
           >
-            {reverse ? "Gramatura po obróbce (g)" : "Gramatura surowa (g)"}
+            {reverse
+              ? t("CALCULATOR.COOKED_WEIGHT")
+              : t("CALCULATOR.RAW_WEIGHT")}
           </label>
           <input
             type="number"
@@ -177,7 +186,7 @@ function ProductCalculatorInner() {
               className="mt-2 text-[13px]"
               style={{ color: "var(--color-destructive)" }}
             >
-              {results.error}
+              {t(results.error as any)}
             </p>
           )}
         </div>
@@ -191,7 +200,7 @@ function ProductCalculatorInner() {
               className="text-[13px] uppercase tracking-widest"
               style={{ color: "var(--color-muted-foreground)" }}
             >
-              Wynik
+              {t("CALCULATOR.RESULT_TITLE")}
             </p>
             <h3 className="font-serif text-[28px] mt-1">
               {selectedProduct?.name ?? "—"}
@@ -205,20 +214,23 @@ function ProductCalculatorInner() {
                 color: "var(--color-primary)",
               }}
             >
-              {METHOD_LABEL[cookingMethodSlug] ?? cookingMethodSlug}
+              {t(
+                (METHOD_LABEL_KEYS[cookingMethodSlug] as any) ??
+                  `COOKING_METHODS.${cookingMethodSlug.toUpperCase()}`,
+              )}
             </span>
           )}
         </div>
 
         <div className="mt-7 grid grid-cols-2 gap-4">
           <Tile
-            label="Surowo"
+            label={t("RESULTS.RAW_WEIGHT")}
             value={`${r1(results.inputGrams)} g`}
             big
             highlight={reverse}
           />
           <Tile
-            label="Po obróbce"
+            label={t("RESULTS.COOKED_WEIGHT")}
             value={`${r1(results.outputGrams)} g`}
             big
             highlight={!reverse}
@@ -230,24 +242,39 @@ function ProductCalculatorInner() {
             className="text-[13px] mb-3"
             style={{ color: "var(--color-muted-foreground)" }}
           >
-            Na porcję ({r1(results.inputGrams)}g surowych)
+            {t("RESULTS.PER_PORTION")} ({r1(results.inputGrams)}g{" "}
+            {t("RESULTS.RAW_WEIGHT")})
           </p>
-          <MacroRow label="Kalorie" unit="kcal" value={results.portion.kcal} />
-          <MacroRow label="Białko" unit="g" value={results.portion.protein} />
-          <MacroRow label="Tłuszcze" unit="g" value={results.portion.fat} />
           <MacroRow
-            label="Węglowodany"
+            label={t("RESULTS.CALORIES")}
+            unit="kcal"
+            value={results.portion.kcal}
+          />
+          <MacroRow
+            label={t("RESULTS.PROTEIN")}
+            unit="g"
+            value={results.portion.protein}
+          />
+          <MacroRow
+            label={t("RESULTS.FAT")}
+            unit="g"
+            value={results.portion.fat}
+          />
+          <MacroRow
+            label={t("RESULTS.CARBS")}
             unit="g"
             value={results.portion.carbs}
           />
         </div>
 
-        <button className="btn-primary w-full mt-8">Zapisz w historii</button>
+        <button className="btn-primary w-full mt-8">
+          {t("RESULTS.SAVE_TO_HISTORY")}
+        </button>
         <p
           className="text-[12px] mt-3 text-center"
           style={{ color: "var(--color-muted-foreground)" }}
         >
-          Tryb anonimowy: 1–2 obliczenia. Zarejestruj się, aby zapisywać wyniki.
+          {t("CALCULATOR.ANONYMOUS_MODE")}
         </p>
       </div>
     </div>
@@ -323,13 +350,13 @@ const compute = (
   reverse: boolean,
 ) => {
   const g = Number(gramsStr);
-  if (!product) return blank("Wybierz produkt.");
-  if (!Number.isFinite(g) || g <= 0) return blank("Podaj liczbę większą od 0.");
+  if (!product) return blank("CALCULATOR.SELECT_PRODUCT");
+  if (!Number.isFinite(g) || g <= 0) return blank("ERRORS.INVALID_WEIGHT");
 
   const factor = product.product_cooking_factors.find(
     (f) => f.cooking_methods.slug === methodSlug,
   );
-  if (!factor) return blank("Metoda obróbki niedostępna dla tego produktu.");
+  if (!factor) return blank("CALCULATOR.METHOD_UNAVAILABLE");
 
   const yieldF = factor.yield_factor;
   const rawGrams = reverse ? g / yieldF : g;

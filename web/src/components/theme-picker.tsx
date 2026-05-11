@@ -1,14 +1,17 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 export type ColorTheme = "emerald" | "amber" | "sky" | "rose";
 
 const COLOR_KEY = "cookscale-color-theme";
 
-const themes: { id: ColorTheme; label: string; swatch: string }[] = [
-  { id: "emerald", label: "Szmaragd", swatch: "oklch(0.45 0.099 165)" },
-  { id: "amber", label: "Bursztyn", swatch: "oklch(0.56 0.18 55)" },
-  { id: "sky", label: "Ocean", swatch: "oklch(0.50 0.17 232)" },
-  { id: "rose", label: "Jagoda", swatch: "oklch(0.53 0.21 355)" },
+const getThemes = (
+  t: any,
+): { id: ColorTheme; label: string; swatch: string }[] => [
+  { id: "emerald", label: t("THEME.EMERALD"), swatch: "oklch(0.45 0.099 165)" },
+  { id: "amber", label: t("THEME.AMBER"), swatch: "oklch(0.56 0.18 55)" },
+  { id: "sky", label: t("THEME.SKY"), swatch: "oklch(0.50 0.17 232)" },
+  { id: "rose", label: t("THEME.ROSE"), swatch: "oklch(0.53 0.21 355)" },
 ];
 
 export function applyColorTheme(theme: ColorTheme) {
@@ -17,8 +20,10 @@ export function applyColorTheme(theme: ColorTheme) {
 }
 
 export function ThemePicker() {
+  const { t } = useTranslation();
   const [active, setActive] = useState<ColorTheme>("emerald");
   const [mounted, setMounted] = useState(false);
+  const themes = getThemes(t);
 
   useEffect(() => {
     const saved =
@@ -46,7 +51,7 @@ export function ThemePicker() {
         background: "var(--color-card)",
       }}
       role="group"
-      aria-label="Motyw kolorystyczny"
+      aria-label={t("THEME.LABEL")}
     >
       {themes.map(({ id, label, swatch }) => {
         const isActive = active === id;

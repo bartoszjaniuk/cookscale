@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { FOODS, macrosForGrams, r1, type Method } from "@/lib/cookscale-data";
 
 const MAX = 200;
@@ -6,6 +7,7 @@ const MAX = 200;
 type EstimateResult = ReturnType<typeof mockEstimate>;
 
 export function AiCalculator() {
+  const { t } = useTranslation();
   const [text, setText] = useState(
     "makaron 200g gotowany, mięso mielone 150g smażone, przecier pomidorowy 100g, oliwa łyżka",
   );
@@ -37,17 +39,14 @@ export function AiCalculator() {
 
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        setError(
-          (data as { error?: string }).error ??
-            "Błąd serwera. Spróbuj ponownie.",
-        );
+        setError((data as { error?: string }).error ?? t("ERRORS.GENERIC"));
         return;
       }
 
       const data = (await res.json()) as EstimateResult;
       setResult(data);
     } catch {
-      setError("Błąd połączenia. Sprawdź sieć i spróbuj ponownie.");
+      setError(t("ERRORS.NO_CONNECTION"));
     } finally {
       setLoading(false);
     }
@@ -61,7 +60,7 @@ export function AiCalculator() {
           maxLength={MAX}
           value={text}
           onChange={(e) => setText(e.target.value)}
-          placeholder="np. pierś z kurczaka 200g pieczona, ryż 80g surowego, brokuł 150g gotowany"
+          placeholder={t("AI.PLACEHOLDER")}
           className="w-full text-[16px] leading-relaxed bg-transparent outline-none resize-none border-b border-[var(--color-border)] focus:border-[var(--color-primary)] pb-3"
         />
         <div className="flex items-center justify-between mt-4 gap-3">
@@ -69,14 +68,14 @@ export function AiCalculator() {
             className="text-[13px] shrink-0"
             style={{ color: counterColor }}
           >
-            {text.length}/{MAX}
+            {t("AI.CHAR_COUNT", { current: text.length, max: MAX })}
           </span>
           <button
             onClick={submit}
             disabled={loading || text.length === 0}
             className="btn-primary disabled:opacity-50 w-full sm:w-auto"
           >
-            {loading ? "Liczę…" : "Oblicz makro"}
+            {loading ? t("AI.LOADING_BUTTON") : t("AI.SUBMIT")}
           </button>
         </div>
       </div>
@@ -100,7 +99,7 @@ export function AiCalculator() {
               className="text-[12px] uppercase tracking-widest"
               style={{ color: "var(--color-muted-foreground)" }}
             >
-              Całe danie
+              {t("AI.FULL_MEAL")}
             </p>
             <p
               className="font-serif text-[40px] mt-2"
@@ -109,10 +108,19 @@ export function AiCalculator() {
               {r1(result.totalGrams)} g
             </p>
             <div className="mt-6 grid grid-cols-2 gap-x-6 gap-y-3">
-              <Row label="Kalorie" v={`${r1(result.total.kcal)} kcal`} />
-              <Row label="Białko" v={`${r1(result.total.protein)} g`} />
-              <Row label="Tłuszcze" v={`${r1(result.total.fat)} g`} />
-              <Row label="Węglowodany" v={`${r1(result.total.carbs)} g`} />
+              <Row
+                label={t("RESULTS.CALORIES")}
+                v={`${r1(result.total.kcal)} kcal`}
+              />
+              <Row
+                label={t("RESULTS.PROTEIN")}
+                v={`${r1(result.total.protein)} g`}
+              />
+              <Row label={t("RESULTS.FAT")} v={`${r1(result.total.fat)} g`} />
+              <Row
+                label={t("RESULTS.CARBS")}
+                v={`${r1(result.total.carbs)} g`}
+              />
             </div>
           </div>
           <div className="card-soft p-5 md:p-7">
@@ -120,22 +128,31 @@ export function AiCalculator() {
               className="text-[12px] uppercase tracking-widest"
               style={{ color: "var(--color-muted-foreground)" }}
             >
-              Na 100g dania
+              {t("AI.PER_100G")}
             </p>
             <p className="font-serif text-[40px] mt-2">
               {r1(result.per100.kcal)} kcal
             </p>
             <div className="mt-6 grid grid-cols-2 gap-x-6 gap-y-3">
-              <Row label="Białko" v={`${r1(result.per100.protein)} g`} />
-              <Row label="Tłuszcze" v={`${r1(result.per100.fat)} g`} />
-              <Row label="Węglowodany" v={`${r1(result.per100.carbs)} g`} />
-              <Row label="Kalorie" v={`${r1(result.per100.kcal)} kcal`} />
+              <Row
+                label={t("RESULTS.PROTEIN")}
+                v={`${r1(result.per100.protein)} g`}
+              />
+              <Row label={t("RESULTS.FAT")} v={`${r1(result.per100.fat)} g`} />
+              <Row
+                label={t("RESULTS.CARBS")}
+                v={`${r1(result.per100.carbs)} g`}
+              />
+              <Row
+                label={t("RESULTS.CALORIES")}
+                v={`${r1(result.per100.kcal)} kcal`}
+              />
             </div>
           </div>
 
           <div className="md:col-span-2">
             <h4 className="font-serif text-[22px] mb-4">
-              Rozpoznane składniki
+              {t("AI.RECOGNIZED_ITEMS")}
             </h4>
             <ul className="space-y-2">
               {result.items.map((it, i) => (
@@ -149,8 +166,7 @@ export function AiCalculator() {
                       className="text-[12px]"
                       style={{ color: "var(--color-muted-foreground)" }}
                     >
-                      {it.grams} g ·{" "}
-                      {it.method ? methodPL(it.method) : "surowe"}
+                      {it.grams} g · {getMethodLabel(t, it.method)}
                     </p>
                   </div>
                   <p className="text-[14px]">{r1(it.macros.kcal)} kcal</p>
@@ -162,9 +178,9 @@ export function AiCalculator() {
                 className="mt-4 rounded-2xl px-5 py-4 text-[14px]"
                 style={{ background: "var(--color-announcement)" }}
               >
-                ⚠️ Nie rozpoznano:{" "}
-                <strong>{result.unrecognized.join(", ")}</strong>. Wynik
-                częściowy.
+                {t("AI.UNRECOGNIZED_PREFIX")}{" "}
+                <strong>{result.unrecognized.join(", ")}</strong>.{" "}
+                {t("AI.PARTIAL_RESULT")}
               </div>
             )}
           </div>
@@ -186,6 +202,15 @@ function Row({ label, v }: { label: string; v: string }) {
       <span className="text-[15px] font-medium">{v}</span>
     </div>
   );
+}
+
+function getMethodLabel(t: any, m: Method | null | undefined): string {
+  if (!m) return t("AI.METHOD_RAW");
+  return m === "boiling"
+    ? t("AI.METHOD_BOILED")
+    : m === "frying"
+      ? t("AI.METHOD_FRIED")
+      : t("AI.METHOD_BAKED");
 }
 
 function methodPL(m: Method) {

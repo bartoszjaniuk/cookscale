@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { createSupabaseBrowserClient } from "@/lib/supabase";
+import { useTranslation } from "react-i18next";
 
 export function LoginForm() {
   const [email, setEmail] = useState("");
@@ -7,6 +8,7 @@ export function LoginForm() {
   const [submitting, setSubmitting] = useState(false);
   const [info, setInfo] = useState<string | null>(null);
   const [isError, setIsError] = useState(false);
+  const { t } = useTranslation();
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -27,7 +29,7 @@ export function LoginForm() {
 
     if (error) {
       setIsError(true);
-      setInfo("Nieprawidłowy e-mail lub hasło. Spróbuj ponownie.");
+      setInfo(t("AUTH.INVALID_CREDENTIALS"));
       return;
     }
 
@@ -50,9 +52,9 @@ export function LoginForm() {
           .
         </span>
       </div>
-      <h2 className="font-serif text-[28px] mt-6">Zaloguj się</h2>
+      <h2 className="font-serif text-[28px] mt-6">{t("AUTH.SIGN_IN")}</h2>
       <p className="mt-2 text-[14px] text-black/60">
-        Nie masz konta?{" "}
+        {t("AUTH.NO_ACCOUNT")}{" "}
         <a
           href="/login"
           className="underline-offset-4 hover:underline"
@@ -73,7 +75,7 @@ export function LoginForm() {
         onClick={loginWithGoogle}
       >
         <GoogleMark />
-        Kontynuuj z Google
+        {t("AUTH.CONTINUE_WITH_GOOGLE")}
       </button>
 
       <div className="my-6 flex items-center gap-3">
@@ -82,7 +84,7 @@ export function LoginForm() {
           style={{ background: "var(--color-border)" }}
         />
         <span className="text-[12px] uppercase tracking-widest text-black/45">
-          lub
+          {t("AUTH.OR")}
         </span>
         <span
           className="h-px flex-1"
@@ -93,7 +95,7 @@ export function LoginForm() {
       <form onSubmit={submit} className="space-y-6">
         <div>
           <label htmlFor="email" className="text-[13px] text-black/60">
-            E-mail
+            {t("AUTH.EMAIL")}
           </label>
           <input
             id="email"
@@ -108,19 +110,15 @@ export function LoginForm() {
         <div>
           <div className="flex items-baseline justify-between">
             <label htmlFor="password" className="text-[13px] text-black/60">
-              Hasło
+              {t("AUTH.PASSWORD")}
             </label>
             <button
               type="button"
               className="text-[12px] hover:underline underline-offset-4"
               style={{ color: "var(--color-primary)" }}
-              onClick={() =>
-                setInfo(
-                  "Wpisz swój e-mail i kliknij 'Zapomniałeś?' — link do resetu zostanie wysłany.",
-                )
-              }
+              onClick={() => setInfo(t("AUTH.RESET_HINT"))}
             >
-              Zapomniałeś?
+              {t("AUTH.FORGOT_PASSWORD")}
             </button>
           </div>
           <input
@@ -139,7 +137,7 @@ export function LoginForm() {
           disabled={submitting}
           className="btn-primary w-full disabled:opacity-50"
         >
-          {submitting ? "Logowanie…" : "Zaloguj się"}
+          {submitting ? t("AUTH.SIGNING_IN") : t("AUTH.SIGN_IN")}
         </button>
 
         {info && (
@@ -159,13 +157,13 @@ export function LoginForm() {
         )}
 
         <p className="text-[12px] text-black/50 text-center">
-          Logując się akceptujesz{" "}
+          {t("AUTH.TERMS_PREFIX")}{" "}
           <a className="underline underline-offset-4" href="#">
-            Regulamin
+            {t("AUTH.TERMS")}
           </a>{" "}
-          i{" "}
+          {t("AUTH.TERMS_AND")}{" "}
           <a className="underline underline-offset-4" href="#">
-            Politykę prywatności
+            {t("AUTH.PRIVACY")}
           </a>
           .
         </p>
