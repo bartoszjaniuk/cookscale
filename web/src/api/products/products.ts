@@ -9,6 +9,7 @@ export type CookingFactor = {
 
 export type ProductWithFactors = {
   id: string;
+  is_popular: boolean;
   name_en: string;
   name_pl: string;
   calories_kcal: number | null;
@@ -20,6 +21,7 @@ export type ProductWithFactors = {
 
 const PRODUCT_SELECT = `
   id,
+  is_popular,
   name_en,
   name_pl,
   calories_kcal,
@@ -75,8 +77,9 @@ export const getInitialProducts = async (
   const { data, error } = await supabase
     .from("products")
     .select(PRODUCT_SELECT)
+    .eq("is_popular", true)
     .limit(limit)
-    .order("name_en", { ascending: true });
+    .order("name_pl", { ascending: true });
 
   if (error) throw new Error(error.message);
   return mapProducts(data);
