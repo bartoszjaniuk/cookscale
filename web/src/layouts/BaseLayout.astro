@@ -1,5 +1,6 @@
 ---
 import "@/styles/global.css";
+import i18next from "@/i18n";
 
 interface Props {
   title: string;
@@ -17,6 +18,9 @@ const {
   ogDescription,
 } = Astro.props;
 
+const lang = Astro.locals.lang || "en";
+i18next.changeLanguage(lang);
+
 const themeBootstrap = `(function(){try{var t=localStorage.getItem('cookscale-theme')||'light';if(t==='dark')document.documentElement.classList.add('dark');document.documentElement.dataset.theme=t;document.documentElement.dataset.colorTheme='amber';}catch(e){}})();`;
 
 const jsonLd = JSON.stringify({
@@ -33,7 +37,7 @@ const jsonLd = JSON.stringify({
 ---
 
 <!doctype html>
-<html lang="pl">
+<html lang={lang}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
