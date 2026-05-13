@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -6,7 +7,7 @@ export type ColorTheme = "emerald" | "amber" | "sky" | "rose";
 const COLOR_KEY = "cookscale-color-theme";
 
 const getThemes = (
-  t: any,
+  t: (key: string) => string,
 ): { id: ColorTheme; label: string; swatch: string }[] => [
   { id: "emerald", label: t("THEME.EMERALD"), swatch: "oklch(0.45 0.099 165)" },
   { id: "amber", label: t("THEME.AMBER"), swatch: "oklch(0.56 0.18 55)" },

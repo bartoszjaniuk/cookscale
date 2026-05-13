@@ -1,8 +1,11 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import type { TFunction } from "i18next";
 import { FOODS, macrosForGrams, r1, type Method } from "@/lib/cookscale-data";
 
 const MAX = 200;
+
+export type TranslationFunction = TFunction;
 
 type EstimateResult = ReturnType<typeof mockEstimate>;
 
@@ -61,7 +64,7 @@ export function AiCalculator() {
           value={text}
           onChange={(e) => setText(e.target.value)}
           placeholder={t("AI.PLACEHOLDER")}
-          className="w-full text-[16px] leading-relaxed bg-transparent outline-none resize-none border-b border-[var(--color-border)] focus:border-[var(--color-primary)] pb-3"
+          className="w-full text-[16px] leading-relaxed bg-transparent outline-none resize-none border-b border-(--color-border) focus:border-(--color-primary) pb-3"
         />
         <div className="flex items-center justify-between mt-4 gap-3">
           <span
@@ -158,7 +161,7 @@ export function AiCalculator() {
               {result.items.map((it, i) => (
                 <li
                   key={i}
-                  className="flex items-center justify-between bg-white border border-[var(--color-border)] rounded-2xl px-5 py-3"
+                  className="flex items-center justify-between bg-white border border-(--color-border) rounded-2xl px-5 py-3"
                 >
                   <div>
                     <p className="text-[15px]">{it.name}</p>
@@ -192,7 +195,7 @@ export function AiCalculator() {
 
 function Row({ label, v }: { label: string; v: string }) {
   return (
-    <div className="flex justify-between border-b border-[var(--color-border)] pb-2">
+    <div className="flex justify-between border-b border-(--color-border) pb-2">
       <span
         className="text-[14px]"
         style={{ color: "var(--color-muted-foreground)" }}
@@ -204,7 +207,10 @@ function Row({ label, v }: { label: string; v: string }) {
   );
 }
 
-function getMethodLabel(t: any, m: Method | null | undefined): string {
+function getMethodLabel(
+  t: TranslationFunction,
+  m: Method | null | undefined,
+): string {
   if (!m) return t("AI.METHOD_RAW");
   return m === "boiling"
     ? t("AI.METHOD_BOILED")

@@ -1,4 +1,5 @@
 import { createSupabaseBrowserClient } from "@/lib/supabase";
+import { z } from "zod";
 
 export type CookingFactor = {
   cooking_method_id: string;
@@ -8,7 +9,8 @@ export type CookingFactor = {
 
 export type ProductWithFactors = {
   id: string;
-  name: string;
+  name_en: string;
+  name_pl: string;
   calories_kcal: number | null;
   protein_g: number | null;
   fat_g: number | null;
@@ -18,7 +20,8 @@ export type ProductWithFactors = {
 
 const PRODUCT_SELECT = `
   id,
-  name,
+  name_en,
+  name_pl,
   calories_kcal,
   protein_g,
   fat_g,
@@ -37,15 +40,30 @@ const mapProducts = (
 ): ProductWithFactors[] => (data ?? []) as ProductWithFactors[];
 
 export const getProducts = async (
-  query: string,
+  rawQuery: string,
   limit = 20,
 ): Promise<ProductWithFactors[]> => {
+  // Sanitize the query to prevent PostgREST syntax errors
+  // Removes commas, quotes, parentheses and other special characters that might break the .or() filter
+  let safeQuery = "";
+  try {
+    safeQuery = z
+      .string()
+      .parse(rawQuery)
+      .replace(/[(),"]/g, "")
+      .trim();
+  } catch {
+    return [];
+  }
+
+  if (!safeQuery) return [];
+
   const { data, error } = await supabase
     .from("products")
     .select(PRODUCT_SELECT)
-    .ilike("name", `%${query}%`)
+    .or(`name_en.ilike.%${safeQuery}%,name_pl.ilike.%${safeQuery}%`)
     .limit(limit)
-    .order("name", { ascending: true });
+    .order("name_en", { ascending: true });
 
   if (error) throw new Error(error.message);
   return mapProducts(data);
@@ -58,7 +76,7 @@ export const getInitialProducts = async (
     .from("products")
     .select(PRODUCT_SELECT)
     .limit(limit)
-    .order("name", { ascending: true });
+    .order("name_en", { ascending: true });
 
   if (error) throw new Error(error.message);
   return mapProducts(data);

@@ -33,7 +33,10 @@ export const createSupabaseServerClient = (context: {
   createServerClient(supabaseUrl, supabaseAnonKey, {
     cookies: {
       getAll() {
-        return parseCookieHeader(context.request.headers.get("Cookie") ?? "");
+        const parsed = parseCookieHeader(
+          context.request.headers.get("Cookie") ?? "",
+        );
+        return parsed.map((c) => ({ name: c.name, value: c.value ?? "" }));
       },
       setAll(cookiesToSet) {
         cookiesToSet.forEach(({ name, value, options }) =>

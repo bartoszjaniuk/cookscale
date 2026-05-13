@@ -98,6 +98,10 @@ import { View, Text, Pressable, ScrollView } from "../tw";
 </View>
 ```
 
+**CSS Variables (Tailwind v4):**
+
+- **Always use parenthesis syntax** for CSS variables: `border-(--color-border)` instead of `border-[var(--color-border)]`. This is the new canonical syntax for Tailwind v4 and NativeWind v5.
+
 **Dark mode variants work automatically** via `dark:` prefix — no additional setup needed. Color tokens in `src/global.css` adapt based on `Appearance.setColorScheme()`:
 
 ```tsx

@@ -8,6 +8,7 @@
     "build": "astro build",
     "preview": "astro preview",
     "lint": "eslint .",
+    "type-check": "tsc --noEmit",
     "format": "prettier --write ."
   },
   "dependencies": {

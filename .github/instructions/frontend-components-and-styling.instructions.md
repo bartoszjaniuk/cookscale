@@ -21,6 +21,7 @@ applyTo: "web/**/*.{tsx,astro}"
 
 ### Custom & Responsive Values
 
+- **Use parenthesis syntax** for CSS variables: `text-(--color-primary)` instead of `text-[var(--color-primary)]` (Tailwind CSS v4 canonical syntax).
 - Use arbitrary values with square brackets (e.g., `w-[123px]`) for precise one-off designs — balances utility-first approach with design flexibility.
 - Use responsive variants (`sm:`, `md:`, `lg:`, etc.) for adaptive designs — ensures content looks good across all viewport sizes.
 

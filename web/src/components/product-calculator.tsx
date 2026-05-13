@@ -5,6 +5,7 @@ import { AppProviders } from "@/providers/AppProviders";
 import { r1 } from "@/lib/cookscale-data";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { getLocaleName } from "@/lib/utils";
 
 const METHOD_LABEL_KEYS: Record<string, string> = {
   boiling: "COOKING_METHODS.BOILING",
@@ -23,7 +24,7 @@ export function ProductCalculator() {
 }
 
 function ProductCalculatorInner() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [query, setQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -114,7 +115,7 @@ function ProductCalculatorInner() {
                 data-active={selectedProduct?.id === p.id}
                 className="pill-tab"
               >
-                {p.name}
+                {getLocaleName(i18n.language, p.name_en, p.name_pl)}
               </button>
             ))
           )}
@@ -155,7 +156,7 @@ function ProductCalculatorInner() {
                   className="pill-tab pill-tab-green bg-transparent!"
                 >
                   {t(
-                    (METHOD_LABEL_KEYS[m.slug] as any) ??
+                    (METHOD_LABEL_KEYS[m.slug] as Parameters<typeof t>[0]) ??
                       `COOKING_METHODS.${m.slug.toUpperCase()}`,
                   )}
                 </button>
@@ -186,7 +187,7 @@ function ProductCalculatorInner() {
               className="mt-2 text-[13px]"
               style={{ color: "var(--color-destructive)" }}
             >
-              {t(results.error as any)}
+              {t(results.error as Parameters<typeof t>[0])}
             </p>
           )}
         </div>
@@ -203,7 +204,13 @@ function ProductCalculatorInner() {
               {t("CALCULATOR.RESULT_TITLE")}
             </p>
             <h3 className="font-serif text-[28px] mt-1">
-              {selectedProduct?.name ?? "—"}
+              {selectedProduct
+                ? getLocaleName(
+                    i18n.language,
+                    selectedProduct.name_en,
+                    selectedProduct.name_pl,
+                  )
+                : "—"}
             </h3>
           </div>
           {cookingMethodSlug && (
@@ -215,8 +222,9 @@ function ProductCalculatorInner() {
               }}
             >
               {t(
-                (METHOD_LABEL_KEYS[cookingMethodSlug] as any) ??
-                  `COOKING_METHODS.${cookingMethodSlug.toUpperCase()}`,
+                (METHOD_LABEL_KEYS[cookingMethodSlug] as Parameters<
+                  typeof t
+                >[0]) ?? `COOKING_METHODS.${cookingMethodSlug.toUpperCase()}`,
               )}
             </span>
           )}
