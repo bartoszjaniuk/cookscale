@@ -203,16 +203,31 @@ function ProductCalculatorInner() {
             (() => {
               const methodKey = (METHOD_LABEL_KEYS[cookingMethodSlug] ??
                 `COOKING_METHODS.${cookingMethodSlug.toUpperCase()}`) as "CALCULATOR.RAW_WEIGHT";
+
+              const yieldFactor = selectedProduct?.product_cooking_factors.find(
+                (f) => f.cooking_methods.slug === cookingMethodSlug,
+              )?.yield_factor;
+
               return (
-                <span
-                  className="text-[12px] px-3 py-1 rounded-full"
-                  style={{
-                    background: "var(--color-primary-light)",
-                    color: "var(--color-primary)",
-                  }}
-                >
-                  {t(methodKey)}
-                </span>
+                <div className="flex items-center gap-2">
+                  {import.meta.env.DEV && yieldFactor && (
+                    <span
+                      className="text-[10px] font-mono px-2 py-1 rounded-full bg-gray-200 text-gray-600 dark:bg-gray-800 dark:text-gray-400"
+                      title="Yield factor (Dev only)"
+                    >
+                      {yieldFactor}x
+                    </span>
+                  )}
+                  <span
+                    className="text-[12px] px-3 py-1 rounded-full"
+                    style={{
+                      background: "var(--color-primary-light)",
+                      color: "var(--color-primary)",
+                    }}
+                  >
+                    {t(methodKey)}
+                  </span>
+                </div>
               );
             })()}
         </div>
