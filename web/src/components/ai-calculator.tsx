@@ -6,6 +6,7 @@ import { FOODS, macrosForGrams, r1, type Method } from "@/lib/cookscale-data";
 const MAX = 200;
 
 export type TranslationFunction = TFunction;
+export type TranslationKey = Parameters<TranslationFunction>[0];
 
 type EstimateResult = ReturnType<typeof mockEstimate>;
 

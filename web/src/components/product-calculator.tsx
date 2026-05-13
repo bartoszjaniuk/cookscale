@@ -1,13 +1,13 @@
 import { type ProductWithFactors } from "@/api/products/products";
-import { useInitialProductsQuery } from "@/api/products/hooks/useInitialProductsQuery";
-import { useProductsSearchQuery } from "@/api/products/hooks/useProductsSearchQuery";
+import { useProductSearch } from "@/api/products/hooks/useProductSearch";
 import { AppProviders } from "@/providers/AppProviders";
 import { r1 } from "@/lib/cookscale-data";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { getLocaleName } from "@/lib/utils";
+import { TranslationKey } from "./ai-calculator";
 
-const METHOD_LABEL_KEYS: Record<string, string> = {
+const METHOD_LABEL_KEYS: Record<string, TranslationKey> = {
   boiling: "COOKING_METHODS.BOILING",
   frying: "COOKING_METHODS.FRYING",
   baking: "COOKING_METHODS.BAKING",
@@ -26,29 +26,13 @@ export function ProductCalculator() {
 function ProductCalculatorInner() {
   const { t, i18n } = useTranslation();
   const [query, setQuery] = useState("");
-  const [debouncedQuery, setDebouncedQuery] = useState("");
-  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [selectedProduct, setSelectedProduct] =
     useState<ProductWithFactors | null>(null);
   const [cookingMethodSlug, setCookingMethodSlug] = useState("");
   const [grams, setGrams] = useState("100");
   const [reverse, setReverse] = useState(false);
 
-  const { data: initialProducts = [] } = useInitialProductsQuery();
-  const { data: searchResults = [], isFetching: isSearching } =
-    useProductsSearchQuery(debouncedQuery);
-
-  const handleQueryChange = (value: string) => {
-    setQuery(value);
-    if (debounceRef.current) clearTimeout(debounceRef.current);
-    debounceRef.current = setTimeout(() => setDebouncedQuery(value), 300);
-  };
-
-  useEffect(() => {
-    return () => {
-      if (debounceRef.current) clearTimeout(debounceRef.current);
-    };
-  }, []);
+  const { products: displayedProducts, isLoading } = useProductSearch(query);
 
   const handleSelectProduct = (p: ProductWithFactors) => {
     setSelectedProduct(p);
@@ -59,9 +43,6 @@ function ProductCalculatorInner() {
       setCookingMethodSlug(availableSlugs[0] ?? "");
     }
   };
-
-  const displayedProducts =
-    debouncedQuery.length >= 2 ? searchResults : initialProducts;
 
   const availableMethods = selectedProduct
     ? selectedProduct.product_cooking_factors.map((f) => ({
@@ -89,18 +70,18 @@ function ProductCalculatorInner() {
           className="input-search"
           placeholder={t("CALCULATOR.SEARCH_PLACEHOLDER")}
           value={query}
-          onChange={(e) => handleQueryChange(e.target.value)}
+          onChange={(e) => setQuery(e.target.value)}
         />
 
         <div className="mt-4 flex flex-wrap gap-2 max-h-36 md:max-h-44 overflow-y-auto pr-1">
-          {isSearching ? (
+          {isLoading ? (
             <p
               className="text-[14px] py-2"
               style={{ color: "var(--color-muted-foreground)" }}
             >
               {t("CALCULATOR.SEARCHING")}
             </p>
-          ) : displayedProducts.length === 0 && debouncedQuery.length >= 2 ? (
+          ) : displayedProducts.length === 0 && query.length >= 2 ? (
             <p
               className="text-[14px] py-2"
               style={{ color: "var(--color-muted-foreground)" }}
@@ -148,19 +129,20 @@ function ProductCalculatorInner() {
                 {t("CALCULATOR.SELECT_PRODUCT")}
               </span>
             ) : (
-              availableMethods.map((m) => (
-                <button
-                  key={m.id}
-                  onClick={() => setCookingMethodSlug(m.slug)}
-                  data-active={cookingMethodSlug === m.slug}
-                  className="pill-tab pill-tab-green bg-transparent!"
-                >
-                  {t(
-                    (METHOD_LABEL_KEYS[m.slug] as Parameters<typeof t>[0]) ??
-                      `COOKING_METHODS.${m.slug.toUpperCase()}`,
-                  )}
-                </button>
-              ))
+              availableMethods.map((m) => {
+                const methodKey = (METHOD_LABEL_KEYS[m.slug] ??
+                  `COOKING_METHODS.${m.slug.toUpperCase()}`) as "CALCULATOR.RAW_WEIGHT";
+                return (
+                  <button
+                    key={m.id}
+                    onClick={() => setCookingMethodSlug(m.slug)}
+                    data-active={cookingMethodSlug === m.slug}
+                    className="pill-tab pill-tab-green bg-transparent!"
+                  >
+                    {t(methodKey)}
+                  </button>
+                );
+              })
             )}
           </div>
         </div>
@@ -182,14 +164,18 @@ function ProductCalculatorInner() {
             value={grams}
             onChange={(e) => setGrams(e.target.value)}
           />
-          {results.error && (
-            <p
-              className="mt-2 text-[13px]"
-              style={{ color: "var(--color-destructive)" }}
-            >
-              {t(results.error as Parameters<typeof t>[0])}
-            </p>
-          )}
+          {results.error &&
+            (() => {
+              const errorKey = results.error[0] as "CALCULATOR.RAW_WEIGHT";
+              return (
+                <p
+                  className="mt-2 text-[13px]"
+                  style={{ color: "var(--color-destructive)" }}
+                >
+                  {t(errorKey)}
+                </p>
+              );
+            })()}
         </div>
       </div>
 
@@ -213,21 +199,22 @@ function ProductCalculatorInner() {
                 : "—"}
             </h3>
           </div>
-          {cookingMethodSlug && (
-            <span
-              className="text-[12px] px-3 py-1 rounded-full"
-              style={{
-                background: "var(--color-primary-light)",
-                color: "var(--color-primary)",
-              }}
-            >
-              {t(
-                (METHOD_LABEL_KEYS[cookingMethodSlug] as Parameters<
-                  typeof t
-                >[0]) ?? `COOKING_METHODS.${cookingMethodSlug.toUpperCase()}`,
-              )}
-            </span>
-          )}
+          {cookingMethodSlug &&
+            (() => {
+              const methodKey = (METHOD_LABEL_KEYS[cookingMethodSlug] ??
+                `COOKING_METHODS.${cookingMethodSlug.toUpperCase()}`) as "CALCULATOR.RAW_WEIGHT";
+              return (
+                <span
+                  className="text-[12px] px-3 py-1 rounded-full"
+                  style={{
+                    background: "var(--color-primary-light)",
+                    color: "var(--color-primary)",
+                  }}
+                >
+                  {t(methodKey)}
+                </span>
+              );
+            })()}
         </div>
 
         <div className="mt-7 grid grid-cols-2 gap-4">
@@ -395,6 +382,6 @@ const blank = (error: string) => ({
   error,
   inputGrams: 0,
   outputGrams: 0,
-  per100: { kcal: 0, protein: 0, fat: 0, carbs: 0 } as Macros,
-  portion: { kcal: 0, protein: 0, fat: 0, carbs: 0 } as Macros,
+  per100: { kcal: 0, protein: 0, fat: 0, carbs: 0 },
+  portion: { kcal: 0, protein: 0, fat: 0, carbs: 0 },
 });
