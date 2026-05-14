@@ -76,15 +76,18 @@ export function NavHeader({ currentPath, isLoggedIn }: Props) {
           "color-mix(in oklab, var(--color-background) 80%, transparent)",
       }}
     >
-      <div className="max-w-6xl mx-auto px-5 md:px-8 h-16 flex items-center justify-between">
-        <a href="/" className="flex items-baseline">
-          <span className="font-serif text-[26px] leading-none">CookScale</span>
-          <span
-            className="text-[26px] leading-none"
-            style={{ color: "var(--color-primary)" }}
-          >
-            .
-          </span>
+      <div className="max-w-6xl mx-auto px-5 md:px-8 h-18 flex items-center justify-between">
+        <a href="/" className="flex items-center gap-2">
+          <img
+            src="/assets/logo400x400.svg"
+            alt="CookScale Logo"
+            className="w-16 h-16 rounded-lg mb-4"
+          />
+          <div className="flex items-baseline">
+            <span className="font-serif text-[26px] leading-none">
+              CookScale
+            </span>
+          </div>
         </a>
 
         {/* Desktop nav */}
