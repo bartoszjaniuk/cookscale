@@ -4,6 +4,7 @@ import { AppProviders } from "@/providers/AppProviders";
 import { r1 } from "@/lib/cookscale-data";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { ArrowRight, ArrowLeft } from "lucide-react";
 import { getLocaleName } from "@/lib/utils";
 import { TranslationKey } from "./ai-calculator";
 
@@ -110,23 +111,20 @@ function ProductCalculatorInner() {
             >
               {t("CALCULATOR.METHOD_LABEL")}
             </label>
-            <button
-              onClick={() => setReverse((v) => !v)}
-              className="text-[13px] underline-offset-4 hover:underline"
-              style={{ color: "var(--color-primary)" }}
-            >
-              {reverse
-                ? t("CALCULATOR.STANDARD_MODE_LABEL")
-                : t("CALCULATOR.REVERSE_MODE_LABEL")}
-            </button>
           </div>
           <div className="inline-flex w-full sm:w-auto p-1 rounded-full border border-(--color-border) bg-white">
             {availableMethods.length === 0 ? (
               <span
                 className="text-[13px] px-4 py-2"
-                style={{ color: "var(--color-muted-foreground)" }}
+                style={{
+                  color: selectedProduct
+                    ? "var(--color-destructive)"
+                    : "var(--color-muted-foreground)",
+                }}
               >
-                {t("CALCULATOR.SELECT_PRODUCT")}
+                {selectedProduct
+                  ? t("CALCULATOR.METHOD_UNAVAILABLE")
+                  : t("CALCULATOR.SELECT_PRODUCT")}
               </span>
             ) : (
               availableMethods.map((m) => {
@@ -210,6 +208,17 @@ function ProductCalculatorInner() {
 
               return (
                 <div className="flex items-center gap-2">
+                  <span
+                    className="text-[12px] px-3 py-1 rounded-full font-medium"
+                    style={{
+                      background: "var(--color-primary-light)",
+                      color: "var(--color-primary)",
+                    }}
+                  >
+                    {yieldFactor && yieldFactor > 1
+                      ? `+${Math.round((yieldFactor - 1) * 100)}%`
+                      : `-${Math.round((1 - (yieldFactor || 1)) * 100)}%`}
+                  </span>
                   {import.meta.env.DEV && yieldFactor && (
                     <span
                       className="text-[10px] font-mono px-2 py-1 rounded-full bg-gray-200 text-gray-600 dark:bg-gray-800 dark:text-gray-400"
@@ -221,8 +230,8 @@ function ProductCalculatorInner() {
                   <span
                     className="text-[12px] px-3 py-1 rounded-full"
                     style={{
-                      background: "var(--color-primary-light)",
-                      color: "var(--color-primary)",
+                      background: "var(--color-primary-muted)",
+                      color: "var(--color-foreground)",
                     }}
                   >
                     {t(methodKey)}
@@ -232,19 +241,31 @@ function ProductCalculatorInner() {
             })()}
         </div>
 
-        <div className="mt-7 grid grid-cols-2 gap-4">
-          <Tile
-            label={t("RESULTS.RAW_WEIGHT")}
-            value={`${r1(results.inputGrams)} g`}
-            big
-            highlight={reverse}
-          />
-          <Tile
-            label={t("RESULTS.COOKED_WEIGHT")}
-            value={`${r1(results.outputGrams)} g`}
-            big
-            highlight={!reverse}
-          />
+        <div className="mt-7 flex items-center justify-between gap-2">
+          <div className="flex-1">
+            <Tile
+              label={t("RESULTS.RAW_WEIGHT")}
+              value={`${r1(results.inputGrams)} g`}
+              big
+              highlight={reverse}
+            />
+          </div>
+          <button
+            onClick={() => setReverse((v) => !v)}
+            className="shrink-0 p-3 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+            style={{ color: "var(--color-primary)" }}
+            aria-label="Toggle calculation mode"
+          >
+            {reverse ? <ArrowLeft size={24} /> : <ArrowRight size={24} />}
+          </button>
+          <div className="flex-1">
+            <Tile
+              label={t("RESULTS.COOKED_WEIGHT")}
+              value={`${r1(results.outputGrams)} g`}
+              big
+              highlight={!reverse}
+            />
+          </div>
         </div>
 
         <div className="mt-6 flex flex-col gap-0">
