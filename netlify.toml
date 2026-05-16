@@ -5,3 +5,5 @@
 
 [build.environment]
   NODE_VERSION = "22"
+  PUBLIC_SUPABASE_URL = "https://luhigyysrlpsidqpraad.supabase.co"
+  PUBLIC_SUPABASE_ANON_KEY = "sb_publishable_ehRnjA60jawCCRyZEMuioQ_IV4-O9v6"
