@@ -72,6 +72,7 @@
     "zod": "^3.24.2"
   },
   "devDependencies": {
+    "@astrojs/netlify": "7.0.9",
     "@eslint/js": "^9.32.0",
     "@lovable.dev/vite-tanstack-config": "^1.5.1",
     "@types/node": "^22.16.5",
