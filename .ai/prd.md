@@ -88,11 +88,19 @@ Docelowy użytkownik to osoba dbająca o dietę, śledząca kalorie i makro, kor
 
 ### 3.2 Tryb „dania z AI" (Premium + 1 trial)
 
-- Pole tekstowe z limitem 200 znaków i progresywnym licznikiem znaków widocznym w polu tekstowym
-- Użytkownik wpisuje opis dania lub przepis w języku naturalnym (np. „makaron 200g, mięso mielone 150g, przecier pomidorowy 100g, oliwa łyżka")
+- Pole tekstowe z limitem **800 znaków** (surowy input) i progresywnym licznikiem znaków widocznym w polu tekstowym
+- Użytkownik wpisuje opis dania lub wkleja przepis w języku naturalnym (np. „makaron 200g, mięso mielone 150g, przecier pomidorowy 100g, oliwa łyżka" albo wieloliniowy przepis)
+- **Normalizacja inputu po stronie klienta przed wysłaniem do backendu**: usunięcie wielokrotnych spacji, tabulatorów, nadmiarowych nowych linii (collapse whitespace), trim — zmniejsza liczbę tokenów wysyłanych do LLM bez utraty informacji dla użytkownika
 - Wywołanie LLM przez OpenRouter – konkretny model do wskazania przez właściciela projektu
-- Wynik: całkowita masa dania po obróbce + makro na całe danie + makro na 100g
-- Obsługa błędów AI: przy nierozpoznanym składniku zwracany jest częściowy wynik z ostrzeżeniem (nie blokuje całego obliczenia)
+- Wynik zawiera:
+  - Całkowita masa dania po obróbce (g)
+  - Makro na całe danie: kalorie (kcal), białko (g), tłuszcze (g), węglowodany (g)
+  - Makro na 100g dania
+  - **Podział na porcje**: użytkownik może dynamicznie wprowadzić liczbę porcji, a UI przelicza wyniki na podstawie już zwróconych danych (bez ponownego wywołania LLM)
+- Obsługa błędów AI przy nierozpoznanym składniku:
+  - Zwracany jest częściowy wynik dla rozpoznanych składników z ostrzeżeniem (nie blokuje całego obliczenia)
+  - Jeśli dane składnika nie są dostępne lokalnie, LLM pobiera dane odżywcze z zewnętrznego źródła (priorytetowo USDA FoodData Central)
+  - Informacja o źródle danych (np. „Dane dla [składnik] pobrane z USDA") wyświetlana jest użytkownikowi wyłącznie w trybie `__DEV__`
 - 1 darmowy trial powiązany z device ID (mobile) / IP (przeglądarka), dostępny przed rejestracją
 - Po wyczerpaniu trialu: ekran rejestracji z komunikatem „Zarejestruj się, aby odblokować więcej obliczeń"
 - Pełny dostęp do trybu AI dla użytkowników Premium (limity do ustalenia po zebraniu pierwszych danych)
@@ -318,21 +326,25 @@ Kryteria akceptacji:
 
 US-013
 Tytuł: Wprowadzenie opisu dania w języku naturalnym
-Opis: Jako użytkownik Premium, chcę wpisać opis mojego dania w zwykłym języku (np. „pierś z kurczaka 200g pieczona, ziemniaki 300g gotowane, brokuł 150g na parze"), aby AI automatycznie obliczył makro całego posiłku.
+Opis: Jako użytkownik Premium, chcę wpisać opis mojego dania lub wkleić przepis w zwykłym języku (np. „pierś z kurczaka 200g pieczona, ziemniaki 300g gotowane, brokuł 150g na parze"), aby AI automatycznie obliczył makro całego posiłku.
 Kryteria akceptacji:
 
-- W trybie AI dostępne jest pole tekstowe z limitem 200 znaków
-- Progresywny licznik znaków jest widoczny w polu tekstowym i zmienia kolor lub styl, gdy użytkownik zbliża się do limitu
-- Użytkownik nie może wprowadzić więcej niż 200 znaków (blokada lub odcięcie na poziomie UI i backendu)
-- Po zatwierdzeniu aplikacja wysyła opis do backendu, który wywołuje LLM przez OpenRouter
-- Pole tekstowe wspiera wielowierszowy tekst
+- W trybie AI dostępne jest pole tekstowe z limitem 800 znaków (surowy input)
+- Progresywny licznik znaków jest widoczny w polu tekstowym i zmienia kolor lub styl, gdy użytkownik zbliża się do limitu (np. przy >700 znaków)
+- Użytkownik nie może wprowadzić więcej niż 800 znaków (blokada lub odcięcie na poziomie UI)
+- Przed wysłaniem do backendu aplikacja normalizuje input po stronie klienta: collapse whitespace (wielokrotne spacje, tabulatory, nadmiarowe nowe linie → pojedyncza spacja lub nowa linia), trim początku i końca
+- Backend waliduje znormalizowany tekst i odrzuca żądania przekraczające dopuszczalną długość
+- Po zatwierdzeniu aplikacja wysyła znormalizowany opis do backendu, który wywołuje LLM przez OpenRouter
+- Pole tekstowe wspiera wielowierszowy tekst i wklejanie przepisów
 
 US-014
 Tytuł: Wyświetlenie wyników AI dla dania
-Opis: Jako użytkownik Premium po opisaniu dania, chcę otrzymać wynik zawierający całkowitą masę dania i makro, aby móc dokładnie zalogować posiłek w dzienniku kalorii.
+Opis: Jako użytkownik Premium po opisaniu dania, chcę otrzymać wynik zawierający całkowitą masę dania, makro i możliwość podziału na porcje, aby móc dokładnie zalogować posiłek w dzienniku kalorii.
 Kryteria akceptacji:
 
 - Wynik zawiera: całkowitą masę dania po obróbce (g), kalorie (kcal), białko (g), tłuszcze (g), węglowodany (g) – dla całego dania i na 100g
+- Wynik zawiera sekcję „Podział na porcje": użytkownik może wpisać liczbę porcji (domyślnie 1), a UI dynamicznie przelicza wartości makro i gramaturę na porcję — bez ponownego wywołania LLM (obliczenia czysto po stronie klienta na podstawie zwróconych danych)
+- Liczba porcji przyjmuje wyłącznie wartości całkowite dodatnie (≥1)
 - Wynik jest wyświetlany w czytelnym formacie, analogicznym do wyniku trybu produktu
 - Czas oczekiwania na odpowiedź AI jest sygnalizowany wskaźnikiem ładowania
 - W przypadku błędu sieciowego lub braku odpowiedzi API aplikacja wyświetla stosowny komunikat błędu i umożliwia ponowienie próby
@@ -342,9 +354,11 @@ Tytuł: Obsługa częściowego wyniku AI przy nierozpoznanym składniku
 Opis: Jako użytkownik Premium, gdy AI nie rozpoznaje jednego ze składników dania, chcę otrzymać częściowy wynik z ostrzeżeniem, zamiast całkowitego błędu, aby nie tracić obliczeń dla pozostałych składników.
 Kryteria akceptacji:
 
-- Gdy LLM nie rozpoznaje składnika, zwraca częściowy wynik dla pozostałych składników
+- Gdy LLM nie rozpoznaje składnika w lokalnej bazie, podejmuje próbę pobrania danych odżywczych z zewnętrznego źródła (priorytetowo USDA FoodData Central)
+- Jeśli dane zostały pobrane z zewnętrznego źródła, wynik dla danego składnika jest włączony do obliczeń bez ostrzeżenia dla użytkownika; informacja o źródle („Dane dla [składnik] pobrane z USDA") wyświetlana jest wyłącznie w trybie `__DEV__`
+- Jeśli dane składnika nie są dostępne ani lokalnie, ani z zewnętrznego źródła, LLM zwraca częściowy wynik dla pozostałych składników
 - Aplikacja wyświetla wynik z widocznym ostrzeżeniem np. „Nie rozpoznano: [nazwa składnika] – pomiń go lub spróbuj ponownie z inną nazwą"
-- Obliczenia dla rozpoznanych składników są kompletne i poprawne
+- Obliczenia dla rozpoznanych składników (lokalnych i z zewnętrznego źródła) są kompletne i poprawne
 - Użytkownik może zamknąć ostrzeżenie i korzystać z częściowego wyniku
 
 US-016
@@ -518,13 +532,13 @@ Kryteria akceptacji:
 
 US-029
 Tytuł: Przekroczenie limitu znaków w trybie AI
-Opis: Jako użytkownik trybu AI, gdy próbuję wpisać opis dłuższy niż 200 znaków, chcę aby aplikacja jasno komunikowała limit, aby dostosować opis dania.
+Opis: Jako użytkownik trybu AI, gdy próbuję wpisać opis dłuższy niż 800 znaków, chcę aby aplikacja jasno komunikowała limit, aby dostosować opis dania.
 Kryteria akceptacji:
 
-- Pole tekstowe wyświetla progresywny licznik znaków (np. „120/200") widoczny przez cały czas pisania
-- Licznik zmienia kolor (np. na czerwony) gdy użytkownik zbliża się do limitu (np. przy >180 znaków)
-- Po osiągnięciu 200 znaków pole przestaje przyjmować nowe znaki (blokada na poziomie UI)
-- Backend również waliduje limit 200 znaków i odrzuca żądania z dłuższym opisem
+- Pole tekstowe wyświetla progresywny licznik znaków (np. „450/800") widoczny przez cały czas pisania
+- Licznik zmienia kolor (np. na czerwony) gdy użytkownik zbliża się do limitu (np. przy >700 znaków)
+- Po osiągnięciu 800 znaków pole przestaje przyjmować nowe znaki (blokada na poziomie UI)
+- Backend waliduje limit po znormalizowanym inputie i odrzuca żądania przekraczające dopuszczalną długość
 - Komunikat o przekroczeniu limitu jest zlokalizowany
 
 ---

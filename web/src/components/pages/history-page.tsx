@@ -46,7 +46,7 @@ export function HistoryPage({ rows }: Props) {
 
       {rows.length === 0 ? (
         <div
-          className="mt-10 rounded-3xl px-5 md:px-8 py-10 md:py-14 text-center"
+          className="mt-10 rounded-2xl px-5 md:px-8 py-10 md:py-14 text-center"
           style={{ background: "var(--color-secondary)" }}
         >
           <p className="font-serif text-[22px]">{t("PAGES.HISTORY_EMPTY")}</p>

@@ -9,6 +9,7 @@ const RequestSchema = z.object({
 type IngredientItem = {
   name: string;
   grams: number;
+  rawGrams: number;
   method: Method | null;
   macros: { kcal: number; protein: number; fat: number; carbs: number };
 };
@@ -18,7 +19,9 @@ type EstimateResult = {
   unrecognized: string[];
   total: { kcal: number; protein: number; fat: number; carbs: number };
   totalGrams: number;
+  rawTotalGrams: number;
   per100: { kcal: number; protein: number; fat: number; carbs: number };
+  rawPer100: { kcal: number; protein: number; fat: number; carbs: number };
 };
 
 export const POST: APIRoute = async ({ request }) => {
@@ -97,6 +100,7 @@ function estimateLocally(input: string): EstimateResult {
     items.push({
       name: food.pl,
       grams: Math.round(cookedGrams),
+      rawGrams: Math.round(grams),
       method,
       macros: macrosForGrams(food, grams),
     });
@@ -108,6 +112,7 @@ function estimateLocally(input: string): EstimateResult {
     items.push({
       name: "Oliwa",
       grams: g,
+      rawGrams: g,
       method: null,
       macros: { kcal: 9 * g, protein: 0, fat: g, carbs: 0 },
     });
@@ -192,6 +197,7 @@ Gdzie grams to gramatura SUROWEGO produktu wpisana przez użytkownika.`;
     items.push({
       name: food.pl,
       grams: Math.round(cookedGrams),
+      rawGrams: Math.round(item.grams),
       method: item.method,
       macros: macrosForGrams(food, item.grams),
     });
@@ -219,6 +225,17 @@ function aggregateItems(
 
   const totalGrams = items.reduce((acc, item) => acc + item.grams, 0);
 
+  const rawTotalGrams = items.reduce((a, b) => {
+    // Odwracamy wagę używając wydajności
+    if (b.method && b.grams > 0) {
+      const food = FOODS.find((f) => f.pl === b.name);
+      if (food && food.yields[b.method]) {
+        return a + b.grams / food.yields[b.method];
+      }
+    }
+    return a + b.grams;
+  }, 0);
+
   const per100 =
     totalGrams > 0
       ? {
@@ -229,5 +246,23 @@ function aggregateItems(
         }
       : { kcal: 0, protein: 0, fat: 0, carbs: 0 };
 
-  return { items, unrecognized, total, totalGrams, per100 };
+  const rawPer100 =
+    rawTotalGrams > 0
+      ? {
+          kcal: (total.kcal / rawTotalGrams) * 100,
+          protein: (total.protein / rawTotalGrams) * 100,
+          fat: (total.fat / rawTotalGrams) * 100,
+          carbs: (total.carbs / rawTotalGrams) * 100,
+        }
+      : { kcal: 0, protein: 0, fat: 0, carbs: 0 };
+
+  return {
+    items,
+    unrecognized,
+    total,
+    totalGrams,
+    rawTotalGrams,
+    per100,
+    rawPer100,
+  };
 }

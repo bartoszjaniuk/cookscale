@@ -39,7 +39,7 @@ export function ThemeToggle() {
       aria-label={
         theme === "light" ? "Przełącz na tryb ciemny" : "Przełącz na tryb jasny"
       }
-      className="grid place-items-center w-9 h-9 rounded-lg border transition-colors"
+      className="grid place-items-center w-9 h-9 rounded-2xl border transition-colors"
       style={{
         color: "var(--color-foreground)",
         background: "var(--color-secondary)",

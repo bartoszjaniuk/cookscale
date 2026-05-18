@@ -112,7 +112,7 @@ function ProductCalculatorInner() {
               {t("CALCULATOR.METHOD_LABEL")}
             </label>
           </div>
-          <div className="inline-flex w-full sm:w-auto p-1 rounded-full border border-(--color-border) bg-white">
+          <div className="inline-flex w-full sm:w-auto p-1 rounded-2xl border border-(--color-border) bg-white">
             {availableMethods.length === 0 ? (
               <span
                 className="text-[13px] px-4 py-2"
@@ -209,7 +209,7 @@ function ProductCalculatorInner() {
               return (
                 <div className="flex items-center gap-2">
                   <span
-                    className="text-[12px] px-3 py-1 rounded-full font-medium"
+                    className="text-[12px] px-3 py-1 rounded-2xl font-medium"
                     style={{
                       background: "var(--color-primary-light)",
                       color: "var(--color-primary)",
@@ -221,14 +221,14 @@ function ProductCalculatorInner() {
                   </span>
                   {import.meta.env.DEV && yieldFactor && (
                     <span
-                      className="text-[10px] font-mono px-2 py-1 rounded-full bg-gray-200 text-gray-600 dark:bg-gray-800 dark:text-gray-400"
+                      className="text-[10px] font-mono px-2 py-1 rounded-2xl bg-gray-200 text-gray-600 dark:bg-gray-800 dark:text-gray-400"
                       title="Yield factor (Dev only)"
                     >
                       {yieldFactor}x
                     </span>
                   )}
                   <span
-                    className="text-[12px] px-3 py-1 rounded-full"
+                    className="text-[12px] px-3 py-1 rounded-2xl"
                     style={{
                       background: "var(--color-primary-muted)",
                       color: "var(--color-foreground)",
@@ -252,7 +252,7 @@ function ProductCalculatorInner() {
           </div>
           <button
             onClick={() => setReverse((v) => !v)}
-            className="shrink-0 p-3 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+            className="shrink-0 p-3 rounded-2xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
             style={{ color: "var(--color-primary)" }}
             aria-label="Toggle calculation mode"
           >

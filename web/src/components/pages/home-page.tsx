@@ -43,14 +43,14 @@ export function HomePage() {
         <div className="grid lg:grid-cols-[1.1fr_1fr] gap-8 lg:gap-12 items-center">
           <div>
             <span
-              className="inline-flex items-center gap-2 text-[13px] px-3 py-1 rounded-full"
+              className="inline-flex items-center gap-2 text-[13px] px-3 py-1 rounded-2xl"
               style={{
                 background: "var(--color-primary-light)",
                 color: "var(--color-primary)",
               }}
             >
               <span
-                className="w-1.5 h-1.5 rounded-full"
+                className="w-1.5 h-1.5 rounded-2xl"
                 style={{ background: "var(--color-primary)" }}
               />
               {t("HOME.BADGE")}
@@ -119,7 +119,7 @@ export function HomePage() {
                 {t("HOME.PREVIEW_PRODUCT")}
               </h3>
               <span
-                className="text-[12px] px-3 py-1 rounded-full shrink-0 ml-2"
+                className="text-[12px] px-3 py-1 rounded-2xl shrink-0 ml-2"
                 style={{
                   background: "var(--color-primary-light)",
                   color: "var(--color-primary)",
@@ -165,7 +165,7 @@ export function HomePage() {
               {macros.map(([v, l]) => (
                 <div
                   key={l}
-                  className="rounded-xl py-3"
+                  className="rounded-2xl py-3"
                   style={{ background: "var(--color-secondary)" }}
                 >
                   <p className="font-serif text-[18px] md:text-[20px]">{v}</p>
@@ -188,7 +188,7 @@ export function HomePage() {
       {/* Stats */}
       <section className="max-w-6xl mx-auto px-5 md:px-8 pb-12 md:pb-20">
         <div
-          className="rounded-2xl md:rounded-3xl px-6 md:px-14 py-10 md:py-16 grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12"
+          className="rounded-2xl md:rounded-2xl px-6 md:px-14 py-10 md:py-16 grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12"
           style={{ background: "var(--color-primary-light)" }}
         >
           {stats.map(({ icon: Icon, value, label }) => (
@@ -291,7 +291,7 @@ export function HomePage() {
                 {t("HOME.PREVIEW_PRODUCT")}
               </h3>
               <span
-                className="text-[12px] px-3 py-1 rounded-full shrink-0 ml-2"
+                className="text-[12px] px-3 py-1 rounded-2xl shrink-0 ml-2"
                 style={{
                   background: "var(--color-primary-light)",
                   color: "var(--color-primary)",
@@ -337,7 +337,7 @@ export function HomePage() {
               {macros.map(([v, l]) => (
                 <div
                   key={l}
-                  className="rounded-xl py-3"
+                  className="rounded-2xl py-3"
                   style={{ background: "var(--color-secondary)" }}
                 >
                   <p className="font-serif text-[18px] md:text-[20px]">{v}</p>
@@ -379,7 +379,7 @@ export function HomePage() {
       {/* CTA */}
       <section className="max-w-6xl mx-auto px-5 md:px-8 pb-12 md:pb-20">
         <div
-          className="rounded-2xl md:rounded-3xl px-6 md:px-14 py-10 md:py-16 flex flex-col items-start gap-6 md:flex-row md:items-center md:justify-between"
+          className="rounded-2xl md:rounded-2xl px-6 md:px-14 py-10 md:py-16 flex flex-col items-start gap-6 md:flex-row md:items-center md:justify-between"
           style={{ background: "var(--color-primary-light)" }}
         >
           <div>

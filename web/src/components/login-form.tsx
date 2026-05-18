@@ -66,7 +66,7 @@ export function LoginForm() {
 
       <button
         type="button"
-        className="mt-7 w-full inline-flex items-center justify-center gap-3 rounded-full py-3.5 text-[15px] transition-colors"
+        className="mt-7 w-full inline-flex items-center justify-center gap-3 rounded-2xl py-3.5 text-[15px] transition-colors"
         style={{
           border: "1px solid var(--color-border)",
           background: "var(--color-card)",

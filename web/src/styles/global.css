@@ -202,7 +202,7 @@
     background: var(--color-primary);
     color: var(--color-primary-foreground);
     border: 1px solid var(--color-primary);
-    border-radius: var(--radius-lg);
+    @apply rounded-2xl;
     padding: 16px 28px;
     font-size: 16px;
     font-weight: 400;
@@ -226,7 +226,7 @@
     background: transparent;
     color: var(--color-primary);
     border: 1px solid var(--color-primary);
-    border-radius: var(--radius-lg);
+    @apply rounded-2xl;
     padding: 16px 28px;
     font-size: 16px;
     font-weight: 400;
@@ -244,7 +244,7 @@
   .btn-dark {
     background: var(--invert);
     color: var(--invert-foreground);
-    border-radius: var(--radius-lg);
+    @apply rounded-2xl;
     padding: 14px 32px;
     font-size: 18px;
     font-weight: 400;
@@ -262,7 +262,7 @@
   .btn-ghost {
     background: var(--color-secondary);
     color: var(--color-foreground);
-    border-radius: var(--radius-lg);
+    @apply rounded-2xl;
     padding: 6px 14px;
     font-size: 14px;
     cursor: pointer;
@@ -295,7 +295,7 @@
   .input-search {
     background: var(--color-card);
     border: 1px solid var(--color-border);
-    border-radius: 48px;
+    @apply rounded-2xl;
     padding: 12px 20px;
     font-size: 15px;
     width: 100%;
@@ -311,7 +311,7 @@
   }
 
   .pill-tab {
-    border-radius: 24px;
+    @apply rounded-2xl;
     padding: 8px 18px;
     font-size: 14px;
     background: var(--color-secondary);
@@ -339,7 +339,7 @@
   .card-soft {
     background: var(--color-card);
     color: var(--color-card-foreground);
-    border-radius: 16px;
+    @apply rounded-2xl;
     box-shadow: var(--shadow-card);
     overflow: hidden;
   }

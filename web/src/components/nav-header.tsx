@@ -81,7 +81,7 @@ export function NavHeader({ currentPath, isLoggedIn }: Props) {
           <img
             src="/assets/logo400x400.svg"
             alt="CookScale Logo"
-            className="w-16 h-16 rounded-lg mb-4"
+            className="w-16 h-16 rounded-2xl mb-4"
           />
           <div className="flex items-baseline">
             <span className="font-serif text-[26px] leading-none">
@@ -119,7 +119,7 @@ export function NavHeader({ currentPath, isLoggedIn }: Props) {
             aria-label={t("NAVIGATION.OPEN_MENU")}
             aria-expanded={menuOpen}
             onClick={() => setMenuOpen((prev) => !prev)}
-            className="md:hidden grid place-items-center w-9 h-9 rounded-lg border transition-colors"
+            className="md:hidden grid place-items-center w-9 h-9 rounded-2xl border transition-colors"
             style={{
               color: "var(--color-foreground)",
               background: "var(--color-secondary)",
@@ -176,7 +176,7 @@ export function NavHeader({ currentPath, isLoggedIn }: Props) {
               <a
                 key={href}
                 href={href}
-                className="text-[16px] py-3 px-3 rounded-xl transition-colors"
+                className="text-[16px] py-3 px-3 rounded-2xl transition-colors"
                 style={
                   isActive(href)
                     ? {
