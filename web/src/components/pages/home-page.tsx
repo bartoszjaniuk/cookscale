@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { Zap, Target, ShieldCheck } from "lucide-react";
 import { ProductCalculator } from "@/components/product-calculator";
+import { HomeCalculatorPreview } from "@/components/home-calculator-preview";
 
 export function HomePage() {
   const { t } = useTranslation();
@@ -279,81 +280,7 @@ export function HomePage() {
             ))}
           </div>
 
-          <div className="card-soft p-5 md:p-8">
-            <p
-              className="text-[12px] uppercase tracking-widest"
-              style={{ color: "var(--color-muted-foreground)" }}
-            >
-              {t("HOME.QUICK_PREVIEW")}
-            </p>
-            <div className="mt-3 flex items-baseline justify-between">
-              <h3 className="font-serif text-[22px] md:text-[26px]">
-                {t("HOME.PREVIEW_PRODUCT")}
-              </h3>
-              <span
-                className="text-[12px] px-3 py-1 rounded-2xl shrink-0 ml-2"
-                style={{
-                  background: "var(--color-primary-light)",
-                  color: "var(--color-primary)",
-                }}
-              >
-                {t("COOKING_METHODS.BAKING")}
-              </span>
-            </div>
-            <div className="mt-5 grid grid-cols-2 gap-3">
-              <div
-                className="rounded-2xl p-4 md:p-5"
-                style={{ background: "var(--color-primary-muted)" }}
-              >
-                <p
-                  className="text-[11px] uppercase tracking-widest"
-                  style={{ color: "var(--color-muted-foreground)" }}
-                >
-                  {t("HOME.PREVIEW_RAW")}
-                </p>
-                <p className="font-serif text-[24px] md:text-[28px] mt-2">
-                  200 g
-                </p>
-              </div>
-              <div
-                className="rounded-2xl p-4 md:p-5"
-                style={{ background: "var(--color-primary-light)" }}
-              >
-                <p
-                  className="text-[11px] uppercase tracking-widest"
-                  style={{ color: "var(--color-muted-foreground)" }}
-                >
-                  {t("HOME.PREVIEW_AFTER_BAKING")}
-                </p>
-                <p
-                  className="font-serif text-[24px] md:text-[28px] mt-2"
-                  style={{ color: "var(--color-primary)" }}
-                >
-                  150 g
-                </p>
-              </div>
-            </div>
-            <div className="mt-4 grid grid-cols-4 gap-2 md:gap-3 text-center">
-              {macros.map(([v, l]) => (
-                <div
-                  key={l}
-                  className="rounded-2xl py-3"
-                  style={{ background: "var(--color-secondary)" }}
-                >
-                  <p className="font-serif text-[18px] md:text-[20px]">{v}</p>
-                  <p
-                    className="text-[11px]"
-                    style={{ color: "var(--color-muted-foreground)" }}
-                  >
-                    {l}
-                  </p>
-                </div>
-              ))}
-            </div>
-            <a href="/calculator" className="btn-dark w-full mt-6 md:mt-8">
-              {t("HOME.CALC_YOURS")}
-            </a>
-          </div>
+          <HomeCalculatorPreview />
         </div>
       </section>
 

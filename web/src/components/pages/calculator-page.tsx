@@ -21,8 +21,8 @@ export function CalculatorPage() {
           {t("PAGES.CALCULATOR_DESC")}
         </p>
       </div>
-      <div className="mt-8 md:mt-10">
-        <ProductCalculator />
+      <div className="mt-8 md:mt-10 w-full min-w-0">
+        <ProductCalculator variant="steps" />
       </div>
     </main>
   );

@@ -40,6 +40,11 @@ const mapProducts = (
   data: Record<string, unknown>[] | null,
 ): ProductWithFactors[] => (data ?? []) as ProductWithFactors[];
 
+export const findDefaultProduct = (
+  products: ProductWithFactors[],
+): ProductWithFactors | undefined =>
+  products.find((p) => p.name_en === "Potato" || p.name_pl === "Ziemniak");
+
 export const getAllProducts = async (): Promise<ProductWithFactors[]> => {
   const { data, error } = await supabase
     .from("products")
