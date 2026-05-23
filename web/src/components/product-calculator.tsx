@@ -13,6 +13,8 @@ import {
   ArrowRight,
   ArrowLeft,
   Bookmark,
+  ChevronDown,
+  ChevronUp,
   TrendingDown,
   TrendingUp,
 } from "lucide-react";
@@ -211,7 +213,7 @@ function DefaultInputs({
         onChange={(e) => setQuery(e.target.value)}
       />
 
-      <div className="mt-4 flex flex-wrap gap-2 max-h-36 md:max-h-44 overflow-y-auto pr-1">
+      <div className="mt-4 flex flex-wrap gap-2">
         <ProductPills
           t={t}
           i18nLanguage={i18nLanguage}
@@ -246,9 +248,7 @@ function DefaultInputs({
           className="block text-[14px] mb-1"
           style={{ color: "var(--color-muted-foreground)" }}
         >
-          {reverse
-            ? t("CALCULATOR.COOKED_WEIGHT")
-            : t("CALCULATOR.RAW_WEIGHT")}
+          {reverse ? t("CALCULATOR.COOKED_WEIGHT") : t("CALCULATOR.RAW_WEIGHT")}
         </label>
         <input
           type="number"
@@ -291,6 +291,19 @@ function StepsInputs({
   step2Enabled,
   step3Enabled,
 }: StepsInputsProps) {
+  const [openStep, setOpenStep] = useState<1 | 2 | 3 | null>(1);
+
+  useEffect(() => {
+    if (!step2Enabled && openStep !== 1) {
+      setOpenStep(1);
+      return;
+    }
+
+    if (!step3Enabled && openStep === 3) {
+      setOpenStep(2);
+    }
+  }, [openStep, step2Enabled, step3Enabled]);
+
   const cookedStateLabel = cookingMethodSlug
     ? getCookedStateLabel(t, cookingMethodSlug)
     : t("RESULTS.COOKED_WEIGHT");
@@ -302,6 +315,10 @@ function StepsInputs({
         title={t("CALCULATOR.STEP_1_TITLE")}
         description={t("CALCULATOR.STEP_1_DESC")}
         isLast={false}
+        mobileExpanded={openStep === 1}
+        onMobileToggle={() =>
+          setOpenStep((current) => (current === 1 ? null : 1))
+        }
       >
         <input
           className="input-search block w-full max-w-none"
@@ -318,7 +335,7 @@ function StepsInputs({
               {t("CALCULATOR.POPULAR_PRODUCTS")}
             </p>
           )}
-          <div className="flex w-full flex-wrap gap-2 max-h-40 overflow-y-auto pr-1">
+          <div className="flex w-full flex-wrap gap-2">
             <ProductPills
               t={t}
               i18nLanguage={i18nLanguage}
@@ -338,6 +355,11 @@ function StepsInputs({
         description={t("CALCULATOR.STEP_2_DESC")}
         disabled={!step2Enabled}
         isLast={false}
+        mobileExpanded={openStep === 2}
+        onMobileToggle={() => {
+          if (!step2Enabled) return;
+          setOpenStep((current) => (current === 2 ? null : 2));
+        }}
       >
         <label
           className="block text-[14px] mb-3"
@@ -361,6 +383,11 @@ function StepsInputs({
         description={t("CALCULATOR.STEP_3_DESC")}
         disabled={!step3Enabled}
         isLast
+        mobileExpanded={openStep === 3}
+        onMobileToggle={() => {
+          if (!step3Enabled) return;
+          setOpenStep((current) => (current === 3 ? null : 3));
+        }}
       >
         <label
           className="block text-[14px] font-medium mb-2"
@@ -396,6 +423,8 @@ function CalculatorStep({
   children,
   disabled = false,
   isLast,
+  mobileExpanded = true,
+  onMobileToggle,
 }: {
   step: number;
   title: string;
@@ -403,8 +432,11 @@ function CalculatorStep({
   children: ReactNode;
   disabled?: boolean;
   isLast: boolean;
+  mobileExpanded?: boolean;
+  onMobileToggle?: () => void;
 }) {
   const titleId = `calc-step-${step}-title`;
+  const contentId = `calc-step-${step}-content`;
 
   return (
     <section
@@ -425,12 +457,31 @@ function CalculatorStep({
         {String(step).padStart(2, "0")}
       </div>
       <div className="row-start-1 col-start-2 min-w-0 pt-1 md:pt-2">
-        <h3
-          id={titleId}
-          className="text-[20px] md:text-[24px] font-bold leading-tight"
-        >
-          {title}
-        </h3>
+        <div className="flex items-start justify-between gap-3">
+          <h3
+            id={titleId}
+            className="text-[20px] md:text-[24px] font-bold leading-tight"
+          >
+            {title}
+          </h3>
+          {onMobileToggle && (
+            <button
+              type="button"
+              onClick={onMobileToggle}
+              disabled={disabled}
+              className="md:hidden mt-0.5 inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-(--color-border) bg-white text-(--color-primary) disabled:opacity-50"
+              aria-controls={contentId}
+              aria-expanded={mobileExpanded}
+              aria-label={title}
+            >
+              {mobileExpanded ? (
+                <ChevronUp size={18} />
+              ) : (
+                <ChevronDown size={18} />
+              )}
+            </button>
+          )}
+        </div>
         {description && (
           <p
             className="mt-1 md:mt-2 text-[14px] md:text-[16px] leading-relaxed"
@@ -440,8 +491,13 @@ function CalculatorStep({
           </p>
         )}
       </div>
-      <div className="card-soft row-start-2 col-span-2 lg:col-span-1 lg:col-start-2 w-full min-w-0 p-5 md:p-6">
-        {children}
+      <div
+        id={contentId}
+        className={`row-start-2 col-span-2 lg:col-span-1 lg:col-start-2 w-full min-w-0 ${
+          mobileExpanded ? "block" : "hidden"
+        } md:block`}
+      >
+        <div className="card-soft w-full min-w-0 p-5 md:p-6">{children}</div>
       </div>
     </section>
   );
@@ -516,9 +572,7 @@ function GramsInput({
     <div
       className="flex w-full items-baseline gap-3 border-b border-(--color-border) focus-within:border-(--color-primary) pb-1 transition-colors"
       style={
-        disabled
-          ? { opacity: 0.5, pointerEvents: "none" as const }
-          : undefined
+        disabled ? { opacity: 0.5, pointerEvents: "none" as const } : undefined
       }
     >
       <input
@@ -559,9 +613,7 @@ function WeightDirectionToggle({
     <div
       className="flex items-center gap-3"
       style={
-        disabled
-          ? { opacity: 0.5, pointerEvents: "none" as const }
-          : undefined
+        disabled ? { opacity: 0.5, pointerEvents: "none" as const } : undefined
       }
       role="group"
       aria-label={`${rawLabel} / ${cookedStateLabel}`}
@@ -672,10 +724,7 @@ function WeightError({
 
 type ComputeResult = ReturnType<typeof compute>;
 
-function getMethodLabel(
-  t: TFunction,
-  slug: string,
-): string {
+function getMethodLabel(t: TFunction, slug: string): string {
   const methodKey = (METHOD_LABEL_KEYS[slug] ??
     `COOKING_METHODS.${slug.toUpperCase()}`) as "CALCULATOR.RAW_WEIGHT";
   return t(methodKey);
@@ -710,8 +759,7 @@ export function CalculatorSummaryCard({
   showPer100g?: boolean;
   showMassChangeInfo?: boolean;
 }) {
-  const hasResult =
-    !!selectedProduct && !!cookingMethodSlug && !results.error;
+  const hasResult = !!selectedProduct && !!cookingMethodSlug && !results.error;
 
   const yieldFactor = selectedProduct?.product_cooking_factors.find(
     (f) => f.cooking_methods.slug === cookingMethodSlug,
@@ -734,9 +782,7 @@ export function CalculatorSummaryCard({
     : t("RESULTS.COOKED_WEIGHT");
 
   const changePct =
-    yieldFactor != null
-      ? Math.round(Math.abs((1 - yieldFactor) * 100))
-      : 0;
+    yieldFactor != null ? Math.round(Math.abs((1 - yieldFactor) * 100)) : 0;
   const isMassLoss = (yieldFactor ?? 1) < 1;
 
   return (
