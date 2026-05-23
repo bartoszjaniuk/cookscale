@@ -1019,7 +1019,7 @@ function SummaryWeightValue({
   return (
     <div className="m-0 min-w-0 p-0 text-left">
       <span
-        className="m-0 block p-0 text-[11px] tracking-wide leading-none font-medium"
+        className="m-0 block p-0 text-[12px] tracking-wide leading-none font-medium"
         style={{ color: "var(--color-muted-foreground)" }}
       >
         {label}
@@ -1054,7 +1054,7 @@ function MacroSummaryBox({
       }`}
     >
       <span
-        className="text-[10px] uppercase tracking-wide font-medium leading-tight mb-2"
+        className="text-[12px] uppercase tracking-wide font-medium leading-tight mb-2"
         style={{ color: "var(--color-muted-foreground)" }}
       >
         {label}
@@ -1067,7 +1067,7 @@ function MacroSummaryBox({
         {value}
       </p>
       <p
-        className="text-[11px] mt-1"
+        className="text-[12px] mt-1"
         style={{ color: "var(--color-muted-foreground)" }}
       >
         {unit}
