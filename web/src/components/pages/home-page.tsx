@@ -7,30 +7,19 @@ import {
   ThermometerSun,
   Sparkles,
   Calculator,
+  Scale,
+  Leaf,
+  Users,
+  PieChart,
 } from "lucide-react";
-import { ProductCalculator } from "@/components/product-calculator";
-import { HomeCalculatorPreview } from "@/components/home-calculator-preview";
 
 export function HomePage() {
   const { t } = useTranslation();
 
-  const features = [
-    t("HOME.FEATURE_1"),
-    t("HOME.FEATURE_2"),
-    t("HOME.FEATURE_3"),
-  ];
-
-  const macros: [string, string][] = [
-    ["240", t("HOME.MACRO_KCAL")],
-    ["45", t("HOME.MACRO_PROTEIN_SHORT")],
-    ["5.2", t("HOME.MACRO_FAT_SHORT")],
-    ["0", t("HOME.MACRO_CARBS_SHORT")],
-  ];
-
   return (
     <main className="flex-1 w-full">
       {/* Hero */}
-      <section className="relative py-10 md:py-16 overflow-hidden">
+      <section className="relative py-10 md:py-16 overflow-x-clip">
         {/* Radial Gradient */}
         <div
           className="absolute pointer-events-none top-0 left-1/2 -translate-x-1/2 w-250 h-250 sm:w-375 sm:h-375 rounded-full"
@@ -544,87 +533,225 @@ export function HomePage() {
         </div>
       </section>
 
-      {/* How it works */}
-      <section className="max-w-6xl mx-auto px-5 md:px-8 py-10 md:py-16">
-        <div className="max-w-2xl mb-10 md:mb-16">
-          <h2>{t("HOME.HOW_IT_WORKS_TITLE")}</h2>
-          <p
-            className="mt-3 md:mt-4 text-[15px] md:text-[16px]"
-            style={{ color: "var(--color-muted-foreground)" }}
-          >
-            {t("HOME.HOW_IT_WORKS_SUBTITLE")}
-          </p>
-        </div>
-
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-          <div className="flex flex-col">
-            {[
-              {
-                step: 1,
-                title: t("HOME.STEP_1_TITLE"),
-                desc: t("HOME.STEP_1_DESC"),
-              },
-              {
-                step: 2,
-                title: t("HOME.STEP_2_TITLE"),
-                desc: t("HOME.STEP_2_DESC"),
-              },
-              {
-                step: 3,
-                title: t("HOME.STEP_3_TITLE"),
-                desc: t("HOME.STEP_3_DESC"),
-              },
-            ].map(({ step, title, desc }, index, arr) => (
-              <div
-                key={step}
-                className={`flex items-center gap-6 md:gap-8 py-6 md:py-8 ${
-                  index !== arr.length - 1 ? "border-b" : ""
-                } ${index === 0 ? "pt-0" : ""} ${
-                  index === arr.length - 1 ? "pb-0" : ""
-                }`}
-                style={{ borderColor: "var(--color-primary-muted)" }}
-              >
-                <div
-                  className="font-bold text-[56px] md:text-[72px] leading-none shrink-0 tracking-tighter opacity-20"
-                  style={{ color: "var(--color-primary)" }}
-                >
-                  {String(step).padStart(2, "0")}
-                </div>
-                <div>
-                  <h3 className="text-[20px] md:text-[24px] font-bold">
-                    {title}
-                  </h3>
-                  <p
-                    className="mt-1 md:mt-2 text-[14px] md:text-[16px]"
-                    style={{ color: "var(--color-muted-foreground)" }}
-                  >
-                    {desc}
-                  </p>
-                </div>
-              </div>
-            ))}
+      {/* AI Powered Section */}
+      <section className="w-full relative overflow-hidden py-16 md:py-24">
+        <div className="max-w-7xl mx-auto px-5 md:px-8">
+          <div className="flex flex-col items-center text-center mb-12 md:mb-20 relative z-10">
+            <div
+              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border text-[13px] font-medium mb-6 shadow-sm"
+              style={{
+                background: "var(--color-card)",
+                borderColor: "var(--color-border)",
+                color: "var(--color-foreground)",
+              }}
+            >
+              <Sparkles size={14} style={{ color: "var(--color-primary)" }} />
+              <span>{t("HOME.AI_SECTION_BADGE")}</span>
+            </div>
+            <h2 className="text-[32px] md:text-[46px] font-bold tracking-tight max-w-3xl leading-tight text-foreground">
+              {t("HOME.AI_SECTION_TITLE")}
+            </h2>
+            <p
+              className="mt-4 md:mt-6 text-[16px] md:text-[18px] max-w-2xl leading-relaxed"
+              style={{ color: "var(--color-muted-foreground)" }}
+            >
+              {t("HOME.AI_SECTION_DESC")}
+            </p>
           </div>
 
-          <HomeCalculatorPreview />
-        </div>
-      </section>
+          <div className="relative w-full">
+            {/* Background Concentric Circles / Lines */}
+            <div
+              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] xl:w-[700px] xl:h-[700px] rounded-full border opacity-20 hidden lg:block pointer-events-none"
+              style={{ borderColor: "var(--color-primary)" }}
+            ></div>
+            <div
+              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] xl:w-[950px] xl:h-[950px] rounded-full border border-dashed opacity-10 hidden lg:block pointer-events-none"
+              style={{ borderColor: "var(--color-primary)" }}
+            ></div>
 
-      {/* Inline calculator */}
-      <section className="max-w-6xl mx-auto px-5 md:px-8 py-10 md:py-16">
-        <div className="max-w-2xl">
-          <h2>
-            <em className="italic font-light">{t("HOME.INLINE_HEADING_EM")}</em>
-            {t("HOME.INLINE_HEADING")}
-          </h2>
-          <p
-            className="mt-3 md:mt-4 text-[15px] md:text-[16px]"
-            style={{ color: "var(--color-muted-foreground)" }}
-          >
-            {t("HOME.INLINE_DESC")}
-          </p>
-        </div>
-        <div className="mt-8 md:mt-10">
-          <ProductCalculator />
+            <div className="grid lg:grid-cols-[1fr_auto_1fr] gap-8 lg:gap-12 items-center relative z-10 w-full">
+              {/* Left Col */}
+              <div className="flex flex-col gap-6 w-full lg:max-w-[400px] mx-auto lg:ms-auto">
+                <div
+                  className="rounded-3xl p-6 md:p-8 flex flex-col gap-4 shadow-sm border"
+                  style={{
+                    background: "var(--color-card)",
+                    borderColor: "var(--color-border)",
+                    color: "var(--color-foreground)",
+                  }}
+                >
+                  <div className="flex gap-4">
+                    <div
+                      className="w-12 h-12 rounded-full flex items-center justify-center shrink-0"
+                      style={{ background: "var(--color-primary-light)" }}
+                    >
+                      <Scale
+                        style={{ color: "var(--color-primary)" }}
+                        size={24}
+                      />
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-[18px] mb-2">
+                        {t("HOME.AI_CARD_1_TITLE")}
+                      </h3>
+                      <p
+                        className="text-[14px] leading-relaxed"
+                        style={{ color: "var(--color-muted-foreground)" }}
+                      >
+                        {t("HOME.AI_CARD_1_DESC")}
+                      </p>
+                    </div>
+                  </div>
+                  <div
+                    className="inline-flex self-start sm:ml-16 px-3 py-1 mt-1 text-[12px] font-semibold rounded-full"
+                    style={{
+                      background: "var(--color-primary-muted)",
+                      color: "var(--color-primary)",
+                    }}
+                  >
+                    {t("HOME.AI_CARD_1_BADGE")}
+                  </div>
+                </div>
+
+                <div
+                  className="rounded-3xl p-6 md:p-8 flex flex-col gap-4 shadow-sm border"
+                  style={{
+                    background: "var(--color-card)",
+                    borderColor: "var(--color-border)",
+                    color: "var(--color-foreground)",
+                  }}
+                >
+                  <div className="flex gap-4">
+                    <div
+                      className="w-12 h-12 rounded-full flex items-center justify-center shrink-0"
+                      style={{ background: "var(--color-primary-light)" }}
+                    >
+                      <Leaf
+                        style={{ color: "var(--color-primary)" }}
+                        size={24}
+                      />
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-[18px] mb-2">
+                        {t("HOME.AI_CARD_2_TITLE")}
+                      </h3>
+                      <p
+                        className="text-[14px] leading-relaxed"
+                        style={{ color: "var(--color-muted-foreground)" }}
+                      >
+                        {t("HOME.AI_CARD_2_DESC")}
+                      </p>
+                    </div>
+                  </div>
+                  <div
+                    className="inline-flex self-start sm:ml-16 px-3 py-1 mt-1 text-[12px] font-semibold rounded-full"
+                    style={{
+                      background: "var(--color-primary-muted)",
+                      color: "var(--color-primary)",
+                    }}
+                  >
+                    {t("HOME.AI_CARD_2_BADGE")}
+                  </div>
+                </div>
+              </div>
+
+              {/* Center Phone */}
+              <div className="relative mx-auto w-full max-w-[280px] sm:max-w-[320px] lg:my-0 my-10 z-20">
+                <img
+                  src="/assets/mockup.png"
+                  alt="AI Przeliczenia Preview"
+                  className="w-full h-auto drop-shadow-2xl relative z-10"
+                  style={{ filter: "drop-shadow(0 30px 40px rgba(0,0,0,0.3))" }}
+                />
+              </div>
+
+              {/* Right Col */}
+              <div className="flex flex-col gap-6 w-full lg:max-w-[400px] mx-auto lg:mr-auto">
+                <div
+                  className="rounded-3xl p-6 md:p-8 flex flex-col gap-4 shadow-sm border"
+                  style={{
+                    background: "var(--color-card)",
+                    borderColor: "var(--color-border)",
+                    color: "var(--color-foreground)",
+                  }}
+                >
+                  <div className="flex gap-4">
+                    <div
+                      className="w-12 h-12 rounded-full flex items-center justify-center shrink-0"
+                      style={{ background: "var(--color-primary-light)" }}
+                    >
+                      <Users
+                        style={{ color: "var(--color-primary)" }}
+                        size={24}
+                      />
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-[18px] mb-2">
+                        {t("HOME.AI_CARD_3_TITLE")}
+                      </h3>
+                      <p
+                        className="text-[14px] leading-relaxed"
+                        style={{ color: "var(--color-muted-foreground)" }}
+                      >
+                        {t("HOME.AI_CARD_3_DESC")}
+                      </p>
+                    </div>
+                  </div>
+                  <div
+                    className="inline-flex self-start sm:ml-16 px-3 py-1 mt-1 text-[12px] font-semibold rounded-full"
+                    style={{
+                      background: "var(--color-primary-muted)",
+                      color: "var(--color-primary)",
+                    }}
+                  >
+                    {t("HOME.AI_CARD_3_BADGE")}
+                  </div>
+                </div>
+
+                <div
+                  className="rounded-3xl p-6 md:p-8 flex flex-col gap-4 shadow-sm border"
+                  style={{
+                    background: "var(--color-card)",
+                    borderColor: "var(--color-border)",
+                    color: "var(--color-foreground)",
+                  }}
+                >
+                  <div className="flex gap-4">
+                    <div
+                      className="w-12 h-12 rounded-full flex items-center justify-center shrink-0"
+                      style={{ background: "var(--color-primary-light)" }}
+                    >
+                      <PieChart
+                        style={{ color: "var(--color-primary)" }}
+                        size={24}
+                      />
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-[18px] mb-2">
+                        {t("HOME.AI_CARD_4_TITLE")}
+                      </h3>
+                      <p
+                        className="text-[14px] leading-relaxed"
+                        style={{ color: "var(--color-muted-foreground)" }}
+                      >
+                        {t("HOME.AI_CARD_4_DESC")}
+                      </p>
+                    </div>
+                  </div>
+                  <div
+                    className="inline-flex self-start sm:ml-16 px-3 py-1 mt-1 text-[12px] font-semibold rounded-full"
+                    style={{
+                      background: "var(--color-primary-muted)",
+                      color: "var(--color-primary)",
+                    }}
+                  >
+                    {t("HOME.AI_CARD_4_BADGE")}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
