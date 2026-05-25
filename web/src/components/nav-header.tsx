@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { ThemeToggle } from "@/components/theme-toggle";
 
 interface Props {
   currentPath: string;
@@ -28,20 +27,12 @@ export function NavHeader({ currentPath, isLoggedIn }: Props) {
       {t("NAVIGATION.SIGN_OUT")}
     </a>
   ) : (
-    <>
-      <a
-        href="/login"
-        className="btn-ghost hidden sm:inline-flex py-2.5! px-5! text-[14px]!"
-      >
-        {t("NAVIGATION.LOGIN")}
-      </a>
-      <a
-        href="/login"
-        className="btn-primary hidden sm:inline-flex py-2.5! px-5! text-[14px]!"
-      >
-        {t("NAVIGATION.SIGN_UP")}
-      </a>
-    </>
+    <a
+      href="/login"
+      className="btn-primary hidden sm:inline-flex py-2.5! px-5! text-[14px]!"
+    >
+      {t("NAVIGATION.GET_STARTED")}
+    </a>
   );
 
   const mobileAuthButtons = isLoggedIn ? (
@@ -52,20 +43,12 @@ export function NavHeader({ currentPath, isLoggedIn }: Props) {
       {t("NAVIGATION.SIGN_OUT")}
     </a>
   ) : (
-    <>
-      <a
-        href="/login"
-        className="btn-ghost py-2.5! px-5! text-[14px]! flex-1 text-center"
-      >
-        {t("NAVIGATION.LOGIN")}
-      </a>
-      <a
-        href="/login"
-        className="btn-primary py-2.5! px-5! text-[14px]! flex-1 text-center"
-      >
-        {t("NAVIGATION.SIGN_UP")}
-      </a>
-    </>
+    <a
+      href="/login"
+      className="btn-primary py-2.5! px-5! text-[14px]! flex-1 text-center"
+    >
+      {t("NAVIGATION.GET_STARTED")}
+    </a>
   );
 
   return (
@@ -90,75 +73,76 @@ export function NavHeader({ currentPath, isLoggedIn }: Props) {
           </div>
         </a>
 
-        {/* Desktop nav */}
-        <nav className="hidden md:flex items-center gap-8">
-          {navLinks.map(({ href, label }) => (
-            <a
-              key={href}
-              href={href}
-              className="text-[15px] tracking-[-0.01em] transition-colors"
+        <div className="flex items-center gap-8">
+          {/* Desktop nav */}
+          <nav className="hidden md:flex items-center gap-8">
+            {navLinks.map(({ href, label }) => (
+              <a
+                key={href}
+                href={href}
+                className="text-[15px] tracking-[-0.01em] transition-colors"
+                style={{
+                  color: isActive(href)
+                    ? "var(--color-primary)"
+                    : "var(--color-foreground)",
+                }}
+              >
+                {label}
+              </a>
+            ))}
+          </nav>
+
+          {/* Right side */}
+          <div className="flex items-center gap-3">
+            {authButtons}
+
+            {/* Hamburger */}
+            <button
+              type="button"
+              aria-label={t("NAVIGATION.OPEN_MENU")}
+              aria-expanded={menuOpen}
+              onClick={() => setMenuOpen((prev) => !prev)}
+              className="md:hidden grid place-items-center w-9 h-9 rounded-2xl border transition-colors"
               style={{
-                color: isActive(href)
-                  ? "var(--color-primary)"
-                  : "var(--color-foreground)",
+                color: "var(--color-foreground)",
+                background: "var(--color-secondary)",
+                borderColor: "var(--color-border)",
               }}
             >
-              {label}
-            </a>
-          ))}
-        </nav>
-
-        {/* Right side */}
-        <div className="flex items-center gap-3">
-          <ThemeToggle />
-          {authButtons}
-
-          {/* Hamburger */}
-          <button
-            type="button"
-            aria-label={t("NAVIGATION.OPEN_MENU")}
-            aria-expanded={menuOpen}
-            onClick={() => setMenuOpen((prev) => !prev)}
-            className="md:hidden grid place-items-center w-9 h-9 rounded-2xl border transition-colors"
-            style={{
-              color: "var(--color-foreground)",
-              background: "var(--color-secondary)",
-              borderColor: "var(--color-border)",
-            }}
-          >
-            {menuOpen ? (
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-              >
-                <line x1="18" y1="6" x2="6" y2="18" />
-                <line x1="6" y1="6" x2="18" y2="18" />
-              </svg>
-            ) : (
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-              >
-                <line x1="3" y1="6" x2="21" y2="6" />
-                <line x1="3" y1="12" x2="21" y2="12" />
-                <line x1="3" y1="18" x2="21" y2="18" />
-              </svg>
-            )}
-          </button>
+              {menuOpen ? (
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+              ) : (
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <line x1="3" y1="6" x2="21" y2="6" />
+                  <line x1="3" y1="12" x2="21" y2="12" />
+                  <line x1="3" y1="18" x2="21" y2="18" />
+                </svg>
+              )}
+            </button>
+          </div>
         </div>
       </div>
 

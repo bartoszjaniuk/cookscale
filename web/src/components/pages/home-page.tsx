@@ -1,6 +1,5 @@
 import { useTranslation } from "react-i18next";
 import {
-  Zap,
   Target,
   ShieldCheck,
   Droplets,
@@ -21,24 +20,6 @@ export function HomePage() {
     t("HOME.FEATURE_3"),
   ];
 
-  const stats = [
-    {
-      icon: Zap,
-      value: t("HOME.STAT_TIME_VALUE"),
-      label: t("HOME.STAT_TIME_LABEL"),
-    },
-    {
-      icon: Target,
-      value: t("HOME.STAT_ERROR_VALUE"),
-      label: t("HOME.STAT_ERROR_LABEL"),
-    },
-    {
-      icon: ShieldCheck,
-      value: t("HOME.STAT_TRUST_VALUE"),
-      label: t("HOME.STAT_TRUST_LABEL"),
-    },
-  ];
-
   const macros: [string, string][] = [
     ["240", t("HOME.MACRO_KCAL")],
     ["45", t("HOME.MACRO_PROTEIN_SHORT")],
@@ -49,10 +30,10 @@ export function HomePage() {
   return (
     <main className="flex-1 w-full">
       {/* Hero */}
-      <section className="relative pt-12 md:pt-24 pb-16 md:pb-24 overflow-hidden">
+      <section className="relative py-10 md:py-16 overflow-hidden">
         {/* Radial Gradient */}
         <div
-          className="absolute pointer-events-none top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[1000px] sm:w-[1500px] sm:h-[1500px] rounded-full"
+          className="absolute pointer-events-none top-0 left-1/2 -translate-x-1/2 w-250 h-250 sm:w-375 sm:h-375 rounded-full"
           style={{
             background:
               "radial-gradient(circle at center, var(--color-primary-light) 0%, transparent 60%)",
@@ -62,22 +43,7 @@ export function HomePage() {
         />
 
         <div className="relative z-10 max-w-5xl mx-auto px-5 md:px-8 flex flex-col items-center text-center">
-          <span
-            className="inline-flex items-center gap-2 text-[13px] px-4 py-1.5 rounded-full"
-            style={{
-              background: "var(--color-background)",
-              boxShadow: "0 0 0 1px var(--color-border)",
-              color: "var(--color-foreground)",
-            }}
-          >
-            <span
-              className="w-2 h-2 rounded-full"
-              style={{ background: "var(--color-primary)" }}
-            />
-            {t("HOME.BADGE")}
-          </span>
-
-          <h1 className="mt-6 md:mt-8 max-w-4xl tracking-tight">
+          <h1 className="mt-2 md:mt-4 max-w-4xl tracking-tight">
             {t("HOME.TITLE")}{" "}
             <em className="italic font-light">{t("HOME.TITLE_EM")}</em>
           </h1>
@@ -128,7 +94,7 @@ export function HomePage() {
 
           <div className="relative w-full mt-16 md:mt-24">
             {/* Center "Phone" Card - Replaced with Mockup */}
-            <div className="relative z-10 mx-auto max-w-[280px] sm:max-w-[320px]">
+            <div className="relative z-10 mx-auto max-w-70 sm:max-w-[320px]">
               <img
                 src="/assets/mockup.png"
                 alt="CookScale App Preview"
@@ -344,41 +310,242 @@ export function HomePage() {
         </div>
       </section>
 
-      {/* Stats */}
-      <section className="max-w-6xl mx-auto px-5 md:px-8 pb-12 md:pb-20">
-        <div
-          className="rounded-2xl md:rounded-2xl px-6 md:px-14 py-10 md:py-16 grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12"
-          style={{ background: "var(--color-primary-light)" }}
-        >
-          {stats.map(({ icon: Icon, value, label }) => (
+      {/* Solutions / Features */}
+      <section className="max-w-6xl mx-auto px-5 md:px-8 py-10 md:py-16">
+        <div className="flex flex-col items-center text-center mb-12 md:mb-16">
+          <div
+            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border text-[13px] font-medium mb-6 shadow-sm"
+            style={{
+              background: "var(--color-card)",
+              borderColor: "var(--color-border)",
+              color: "var(--color-foreground)",
+            }}
+          >
+            <Target size={14} style={{ color: "var(--color-primary)" }} />
+            <span>{t("HOME.SOLUTIONS_BADGE")}</span>
+          </div>
+          <h2 className="text-[32px] md:text-[42px] font-bold tracking-tight max-w-2xl leading-tight">
+            {t("HOME.SOLUTIONS_TITLE")}
+          </h2>
+          <p
+            className="mt-4 md:mt-6 text-[16px] md:text-[18px] max-w-2xl leading-relaxed"
+            style={{ color: "var(--color-muted-foreground)" }}
+          >
+            {t("HOME.SOLUTIONS_DESC")}
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
+          {/* Card 1 */}
+          <div
+            className="flex flex-col rounded-[2rem] overflow-hidden border"
+            style={{
+              background: "var(--color-card)",
+              borderColor: "var(--color-border)",
+            }}
+          >
             <div
-              key={label}
-              className="flex items-center gap-4 md:gap-6 text-left"
+              className="h-56 relative flex items-center justify-center p-6 overflow-hidden"
+              style={{ background: "var(--color-primary-muted)" }}
             >
-              <Icon
-                size={54}
-                strokeWidth={1.5}
-                className="shrink-0"
-                style={{ color: "var(--color-primary)" }}
-              />
-              <div>
-                <p className="font-serif text-[22px] md:text-[26px] leading-none">
-                  {value}
-                </p>
-                <p
-                  className="mt-1 md:mt-2 text-[13px] md:text-[14px]"
-                  style={{ color: "var(--color-muted-foreground)" }}
-                >
-                  {label}
-                </p>
+              {/* Abstract composition for calculator */}
+              <div
+                className="absolute w-44 h-28 rounded-2xl shadow-lg border transform -rotate-6 flex flex-col gap-3 p-4"
+                style={{
+                  background: "var(--color-card)",
+                  borderColor: "var(--color-border)",
+                }}
+              >
+                <div className="flex justify-between items-center mb-2">
+                  <div
+                    className="w-1/2 h-2.5 rounded-full"
+                    style={{
+                      background: "var(--color-muted-foreground)",
+                      opacity: 0.3,
+                    }}
+                  ></div>
+                  <div
+                    className="w-1/4 h-2.5 rounded-full"
+                    style={{ background: "var(--color-primary)" }}
+                  ></div>
+                </div>
+                <div
+                  className="w-full h-10 rounded-lg"
+                  style={{ background: "var(--color-secondary)" }}
+                ></div>
+              </div>
+              <div
+                className="absolute w-44 h-28 rounded-2xl shadow-xl border transform rotate-6 flex flex-col gap-3 p-4 translate-y-12 translate-x-12"
+                style={{
+                  background: "var(--color-card)",
+                  borderColor: "var(--color-border)",
+                }}
+              >
+                <div className="flex justify-between items-center mb-2">
+                  <div
+                    className="w-1/2 h-2.5 rounded-full"
+                    style={{
+                      background: "var(--color-muted-foreground)",
+                      opacity: 0.3,
+                    }}
+                  ></div>
+                  <div
+                    className="w-1/3 h-2.5 rounded-full"
+                    style={{ background: "var(--color-foreground)" }}
+                  ></div>
+                </div>
+                <div
+                  className="w-full h-8 rounded-lg"
+                  style={{ background: "var(--color-primary-light)" }}
+                ></div>
               </div>
             </div>
-          ))}
+            <div className="p-8 pt-8 flex-1 flex flex-col">
+              <h3 className="text-[20px] md:text-[22px] font-bold mb-3">
+                {t("HOME.SOLUTION_1_TITLE")}
+              </h3>
+              <p
+                className="text-[15px] leading-relaxed flex-1"
+                style={{ color: "var(--color-muted-foreground)" }}
+              >
+                {t("HOME.SOLUTION_1_DESC")}
+              </p>
+            </div>
+          </div>
+
+          {/* Card 2 */}
+          <div
+            className="flex flex-col rounded-[2rem] overflow-hidden border"
+            style={{
+              background: "var(--color-card)",
+              borderColor: "var(--color-border)",
+            }}
+          >
+            <div
+              className="h-56 relative flex items-center justify-center p-6 overflow-hidden"
+              style={{ background: "var(--color-secondary)" }}
+            >
+              {/* Abstract composition for AI */}
+              <div
+                className="absolute w-56 h-20 rounded-2xl shadow-lg border flex items-center gap-4 p-4 transform -translate-y-6 -translate-x-4"
+                style={{
+                  background: "var(--color-card)",
+                  borderColor: "var(--color-border)",
+                }}
+              >
+                <div
+                  className="w-10 h-10 rounded-full flex items-center justify-center shrink-0"
+                  style={{ background: "var(--color-primary-light)" }}
+                >
+                  <Sparkles
+                    style={{ color: "var(--color-primary)" }}
+                    size={20}
+                  />
+                </div>
+                <div className="flex-1 space-y-2.5">
+                  <div
+                    className="h-2.5 rounded-full w-full"
+                    style={{
+                      background: "var(--color-muted-foreground)",
+                      opacity: 0.2,
+                    }}
+                  ></div>
+                  <div
+                    className="h-2.5 rounded-full w-4/5"
+                    style={{
+                      background: "var(--color-muted-foreground)",
+                      opacity: 0.2,
+                    }}
+                  ></div>
+                </div>
+              </div>
+              <div
+                className="absolute w-48 h-14 rounded-2xl shadow-lg border flex items-center gap-3 p-3 transform translate-y-10 translate-x-10"
+                style={{
+                  background: "var(--color-card)",
+                  borderColor: "var(--color-border)",
+                  opacity: 0.9,
+                }}
+              >
+                <div
+                  className="w-8 h-8 rounded-full shrink-0 border-2"
+                  style={{
+                    background: "var(--color-secondary)",
+                    borderColor: "var(--color-primary)",
+                  }}
+                ></div>
+                <div
+                  className="h-2.5 rounded-full w-full"
+                  style={{
+                    background: "var(--color-foreground)",
+                    opacity: 0.8,
+                  }}
+                ></div>
+              </div>
+            </div>
+            <div className="p-8 pt-8 flex-1 flex flex-col">
+              <h3 className="text-[20px] md:text-[22px] font-bold mb-3">
+                {t("HOME.SOLUTION_2_TITLE")}
+              </h3>
+              <p
+                className="text-[15px] leading-relaxed flex-1"
+                style={{ color: "var(--color-muted-foreground)" }}
+              >
+                {t("HOME.SOLUTION_2_DESC")}
+              </p>
+            </div>
+          </div>
+
+          {/* Card 3 */}
+          <div
+            className="flex flex-col rounded-[2rem] overflow-hidden border"
+            style={{
+              background: "var(--color-card)",
+              borderColor: "var(--color-border)",
+            }}
+          >
+            <div
+              className="h-56 relative flex items-center justify-center p-6 overflow-hidden"
+              style={{ background: "var(--color-primary-light)" }}
+            >
+              {/* Abstract composition for Chart/Data */}
+              <div
+                className="relative w-36 h-36 rounded-full border-[12px] flex items-center justify-center shadow-sm"
+                style={{ borderColor: "var(--color-background)" }}
+              >
+                <div
+                  className="absolute w-full h-full rounded-full border-[12px] border-t-transparent border-r-transparent transform -rotate-12"
+                  style={{ borderColor: "var(--color-primary)" }}
+                ></div>
+                <div className="flex flex-col items-center">
+                  <ShieldCheck
+                    size={28}
+                    style={{ color: "var(--color-primary)" }}
+                    className="mb-1"
+                  />
+                  <div className="text-[15px] font-bold tracking-tight">
+                    USDA
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="p-8 pt-8 flex-1 flex flex-col">
+              <h3 className="text-[20px] md:text-[22px] font-bold mb-3">
+                {t("HOME.SOLUTION_3_TITLE")}
+              </h3>
+              <p
+                className="text-[15px] leading-relaxed flex-1"
+                style={{ color: "var(--color-muted-foreground)" }}
+              >
+                {t("HOME.SOLUTION_3_DESC")}
+              </p>
+            </div>
+          </div>
         </div>
       </section>
 
       {/* How it works */}
-      <section className="max-w-6xl mx-auto px-5 md:px-8 pb-12 md:pb-20">
+      <section className="max-w-6xl mx-auto px-5 md:px-8 py-10 md:py-16">
         <div className="max-w-2xl mb-10 md:mb-16">
           <h2>{t("HOME.HOW_IT_WORKS_TITLE")}</h2>
           <p
@@ -443,7 +610,7 @@ export function HomePage() {
       </section>
 
       {/* Inline calculator */}
-      <section className="max-w-6xl mx-auto px-5 md:px-8 pb-12 md:pb-20">
+      <section className="max-w-6xl mx-auto px-5 md:px-8 py-10 md:py-16">
         <div className="max-w-2xl">
           <h2>
             <em className="italic font-light">{t("HOME.INLINE_HEADING_EM")}</em>
@@ -462,7 +629,7 @@ export function HomePage() {
       </section>
 
       {/* CTA */}
-      <section className="max-w-6xl mx-auto px-5 md:px-8 pb-12 md:pb-20">
+      <section className="max-w-6xl mx-auto px-5 md:px-8 py-10 md:py-16">
         <div
           className="rounded-2xl md:rounded-2xl px-6 md:px-14 py-10 md:py-16 flex flex-col items-start gap-6 md:flex-row md:items-center md:justify-between"
           style={{ background: "var(--color-primary-light)" }}

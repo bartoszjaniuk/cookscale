@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { LanguageSwitcher } from "./language-switcher";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 export function FooterComponent() {
   const { t } = useTranslation();
@@ -85,7 +86,7 @@ export function FooterComponent() {
             </ul>
           </div>
 
-          {/* Język */}
+          {/* Język i motyw */}
           <div>
             <h4
               className="font-serif text-[18px] mb-4"
@@ -93,7 +94,10 @@ export function FooterComponent() {
             >
               {t("FOOTER.LANGUAGE_SECTION")}
             </h4>
-            <LanguageSwitcher />
+            <div className="flex flex-col gap-4">
+              <LanguageSwitcher />
+              <ThemeToggle />
+            </div>
           </div>
         </div>
       </div>
