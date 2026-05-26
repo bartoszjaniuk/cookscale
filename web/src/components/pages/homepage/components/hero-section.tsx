@@ -7,6 +7,46 @@ import {
   Sparkles,
   Calculator,
 } from "lucide-react";
+import { motion, Variants } from "framer-motion";
+
+const containerVariants: Variants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.2,
+    },
+  },
+};
+
+const itemVariants: Variants = {
+  hidden: { opacity: 0, y: 30 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.6, ease: "easeOut" },
+  },
+};
+
+const mockupVariants: Variants = {
+  hidden: { opacity: 0, scale: 0.9, y: 40 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    y: 0,
+    transition: { duration: 0.8, ease: "easeOut", delay: 0.4 },
+  },
+};
+
+const microcardEnterVariants = (delay: number, startX: number): Variants => ({
+  hidden: { opacity: 0, scale: 0.8, x: startX },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    x: 0,
+    transition: { duration: 0.6, delay, ease: "easeOut" },
+  },
+});
 
 export const HeroSection = () => {
   const { t } = useTranslation();
@@ -15,23 +55,33 @@ export const HeroSection = () => {
     <>
       <section className="relative py-10 md:py-16 overflow-x-clip">
         {/* Radial Gradient */}
-        <div
+        <motion.div
+          animate={{ opacity: [0.6, 1, 0.6], scale: [1, 1.05, 1] }}
+          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
           className="absolute pointer-events-none top-0 left-1/2 -translate-x-1/2 w-250 h-250 sm:w-375 sm:h-375 rounded-full"
           style={{
             background:
               "radial-gradient(circle at center, var(--color-primary-light) 0%, transparent 60%)",
-            opacity: 1,
             zIndex: 0,
           }}
         />
 
-        <div className="relative z-10 max-w-5xl mx-auto px-5 md:px-8 flex flex-col items-center text-center">
-          <h1 className="mt-2 md:mt-4 max-w-4xl tracking-tight">
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+          className="relative z-10 max-w-5xl mx-auto px-5 md:px-8 flex flex-col items-center text-center"
+        >
+          <motion.h1
+            variants={itemVariants}
+            className="mt-2 md:mt-4 max-w-4xl tracking-tight"
+          >
             {t("HOME.TITLE")}{" "}
             <em className="italic font-light">{t("HOME.TITLE_EM")}</em>
-          </h1>
+          </motion.h1>
 
-          <p
+          <motion.p
+            variants={itemVariants}
             className="mt-5 md:mt-6 max-w-2xl text-[16px] md:text-[18px]"
             style={{ color: "var(--color-muted-foreground)" }}
           >
@@ -45,9 +95,12 @@ export const HeroSection = () => {
             >
               {t("HOME.DESCRIPTION_HIGHLIGHT")}
             </span>
-          </p>
+          </motion.p>
 
-          <div className="mt-8 md:mt-10 flex flex-col sm:flex-row gap-4 justify-center w-full sm:w-auto">
+          <motion.div
+            variants={itemVariants}
+            className="mt-8 md:mt-10 flex flex-col sm:flex-row gap-4 justify-center w-full sm:w-auto"
+          >
             <a
               href="/calculator"
               className="btn-primary text-center flex items-center justify-center gap-2"
@@ -73,21 +126,25 @@ export const HeroSection = () => {
             >
               {t("HOME.CTA_SECONDARY")}
             </a>
-          </div>
+          </motion.div>
 
           <div className="relative w-full mt-16 md:mt-24">
             {/* Center "Phone" Card - Replaced with Mockup */}
-            <div className="relative z-10 mx-auto max-w-70 sm:max-w-[320px]">
+            <motion.div
+              variants={mockupVariants}
+              className="relative z-10 mx-auto max-w-70 sm:max-w-[320px]"
+            >
               <img
                 src="/assets/mockup.png"
                 alt="CookScale App Preview"
                 className="w-full h-auto drop-shadow-2xl"
                 style={{ filter: "drop-shadow(0 20px 60px rgba(0,0,0,0.15))" }}
               />
-            </div>
+            </motion.div>
 
             {/* Floating Top Left Card: Boiling */}
-            <div
+            <motion.div
+              variants={microcardEnterVariants(0.5, -30)}
               className="absolute top-16 left-0 xl:-left-12 hidden lg:flex flex-col justify-center gap-2 min-h-30 rounded-2xl p-4 shadow-lg border z-0"
               style={{
                 borderColor: "var(--color-border)",
@@ -118,10 +175,11 @@ export const HeroSection = () => {
                   </p>
                 </div>
               </div>
-            </div>
+            </motion.div>
 
             {/* Floating Top Right Card: Baking */}
-            <div
+            <motion.div
+              variants={microcardEnterVariants(0.6, 30)}
               className="absolute top-12 right-0 xl:-right-16 hidden lg:flex flex-col justify-center gap-2 min-h-30 rounded-2xl p-4 shadow-lg border z-0"
               style={{
                 borderColor: "var(--color-border)",
@@ -152,10 +210,11 @@ export const HeroSection = () => {
                   </p>
                 </div>
               </div>
-            </div>
+            </motion.div>
 
             {/* Floating Bottom Left Card: Frying */}
-            <div
+            <motion.div
+              variants={microcardEnterVariants(0.7, -30)}
               className="absolute bottom-16 -left-4 xl:-left-16 hidden lg:flex flex-col justify-center gap-2 min-h-30 rounded-2xl p-4 shadow-lg border z-0"
               style={{
                 borderColor: "var(--color-border)",
@@ -186,10 +245,11 @@ export const HeroSection = () => {
                   </p>
                 </div>
               </div>
-            </div>
+            </motion.div>
 
             {/* Floating Bottom Right Card: Calculator */}
-            <div
+            <motion.div
+              variants={microcardEnterVariants(0.8, 30)}
               className="absolute bottom-12 -right-4 xl:-right-12 hidden lg:flex flex-col justify-center gap-2 min-h-30 rounded-2xl p-4 shadow-lg border z-0"
               style={{
                 borderColor: "var(--color-border)",
@@ -220,10 +280,11 @@ export const HeroSection = () => {
                   </p>
                 </div>
               </div>
-            </div>
+            </motion.div>
 
             {/* Floating Middle Left Card: AI */}
-            <div
+            <motion.div
+              variants={microcardEnterVariants(0.55, -40)}
               className="absolute top-[40%] -left-8 xl:-left-24 hidden lg:flex flex-col justify-center gap-2 min-h-30 rounded-2xl p-4 shadow-lg border z-0"
               style={{
                 borderColor: "var(--color-border)",
@@ -254,10 +315,11 @@ export const HeroSection = () => {
                   </p>
                 </div>
               </div>
-            </div>
+            </motion.div>
 
             {/* Floating Middle Right Card: Data */}
-            <div
+            <motion.div
+              variants={microcardEnterVariants(0.65, 40)}
               className="absolute top-[40%] -right-8 xl:-right-20 hidden lg:flex flex-col justify-center gap-2 min-h-30 rounded-2xl p-4 shadow-lg border z-0"
               style={{
                 borderColor: "var(--color-border)",
@@ -288,9 +350,9 @@ export const HeroSection = () => {
                   </p>
                 </div>
               </div>
-            </div>
+            </motion.div>
           </div>
-        </div>
+        </motion.div>
       </section>
     </>
   );
