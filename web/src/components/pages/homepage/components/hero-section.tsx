@@ -1,31 +1,12 @@
 import { useTranslation } from "react-i18next";
-import { motion } from "framer-motion";
 import {
-  Target,
   ShieldCheck,
   Droplets,
   Flame,
   ThermometerSun,
   Sparkles,
   Calculator,
-  Scale,
-  Leaf,
-  Users,
-  PieChart,
-  Zap,
-  Search,
-  ScanLine,
-  CheckCircle,
-  Heart,
-  ArrowRight,
 } from "lucide-react";
-import {
-  FadeIn,
-  StaggerContainer,
-  StaggerItem,
-  FloatingElement,
-  HeroFloatingCard,
-} from "../../../animations/motion";
 
 export const HeroSection = () => {
   const { t } = useTranslation();
@@ -107,30 +88,30 @@ export const HeroSection = () => {
 
             {/* Floating Top Left Card: Boiling */}
             <div
-              className="absolute top-16 left-0 xl:-left-12 hidden lg:flex flex-col gap-2 rounded-2xl p-4 shadow-lg border z-0"
+              className="absolute top-16 left-0 xl:-left-12 hidden lg:flex flex-col justify-center gap-2 min-h-30 rounded-2xl p-4 shadow-lg border z-0"
               style={{
                 borderColor: "var(--color-border)",
                 background: "var(--color-card)",
-                transform: "rotate(-4deg)",
+                transform: "rotate(8deg)",
                 opacity: 0.95,
               }}
             >
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 w-full">
                 <div
-                  className="w-10 h-10 rounded-full flex items-center justify-center shrink-0"
+                  className="w-14 h-14 rounded-full flex items-center justify-center shrink-0"
                   style={{
                     background: "var(--color-primary-light)",
                     color: "var(--color-primary)",
                   }}
                 >
-                  <Droplets size={20} />
+                  <Droplets size={26} />
                 </div>
-                <div className="text-left max-w-[140px]">
-                  <p className="text-[13px] font-bold">
+                <div className="text-left w-50">
+                  <p className="text-lg font-serif font-medium">
                     {t("COOKING_METHODS.BOILING")}
                   </p>
                   <p
-                    className="text-[11px] leading-snug mt-0.5"
+                    className="text-[13px] leading-snug mt-0.5"
                     style={{ color: "var(--color-muted-foreground)" }}
                   >
                     {t("HOME.METHOD_BOILING_DESC")}
@@ -141,30 +122,30 @@ export const HeroSection = () => {
 
             {/* Floating Top Right Card: Baking */}
             <div
-              className="absolute top-12 right-0 xl:-right-16 hidden lg:flex flex-col gap-2 rounded-2xl p-4 shadow-lg border z-0"
+              className="absolute top-12 right-0 xl:-right-16 hidden lg:flex flex-col justify-center gap-2 min-h-30 rounded-2xl p-4 shadow-lg border z-0"
               style={{
                 borderColor: "var(--color-border)",
                 background: "var(--color-card)",
-                transform: "rotate(6deg)",
+                transform: "rotate(-8deg)",
                 opacity: 0.95,
               }}
             >
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 w-full">
                 <div
-                  className="w-10 h-10 rounded-full flex items-center justify-center shrink-0"
+                  className="w-14 h-14 rounded-full flex items-center justify-center shrink-0"
                   style={{
                     background: "var(--color-primary-light)",
                     color: "var(--color-primary)",
                   }}
                 >
-                  <ThermometerSun size={20} />
+                  <ThermometerSun size={26} />
                 </div>
-                <div className="text-left max-w-[140px]">
-                  <p className="text-[13px] font-bold">
+                <div className="text-left w-50">
+                  <p className="text-lg font-serif font-medium">
                     {t("COOKING_METHODS.BAKING")}
                   </p>
                   <p
-                    className="text-[11px] leading-snug mt-0.5"
+                    className="text-[13px] leading-snug mt-0.5"
                     style={{ color: "var(--color-muted-foreground)" }}
                   >
                     {t("HOME.METHOD_BAKING_DESC")}
@@ -175,7 +156,7 @@ export const HeroSection = () => {
 
             {/* Floating Bottom Left Card: Frying */}
             <div
-              className="absolute bottom-16 -left-4 xl:-left-16 hidden lg:flex flex-col gap-2 rounded-2xl p-4 shadow-lg border z-0"
+              className="absolute bottom-16 -left-4 xl:-left-16 hidden lg:flex flex-col justify-center gap-2 min-h-30 rounded-2xl p-4 shadow-lg border z-0"
               style={{
                 borderColor: "var(--color-border)",
                 background: "var(--color-card)",
@@ -183,22 +164,22 @@ export const HeroSection = () => {
                 opacity: 0.95,
               }}
             >
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 w-full">
                 <div
-                  className="w-10 h-10 rounded-full flex items-center justify-center shrink-0"
+                  className="w-14 h-14 rounded-full flex items-center justify-center shrink-0"
                   style={{
                     background: "var(--color-primary-light)",
                     color: "var(--color-primary)",
                   }}
                 >
-                  <Flame size={20} />
+                  <Flame size={26} />
                 </div>
-                <div className="text-left max-w-[140px]">
-                  <p className="text-[13px] font-bold">
+                <div className="text-left w-50">
+                  <p className="text-lg font-serif font-medium  ">
                     {t("COOKING_METHODS.FRYING")}
                   </p>
                   <p
-                    className="text-[11px] leading-snug mt-0.5"
+                    className="text-[13px] leading-snug mt-0.5"
                     style={{ color: "var(--color-muted-foreground)" }}
                   >
                     {t("HOME.METHOD_FRYING_DESC")}
@@ -209,7 +190,7 @@ export const HeroSection = () => {
 
             {/* Floating Bottom Right Card: Calculator */}
             <div
-              className="absolute bottom-12 -right-4 xl:-right-12 hidden lg:flex flex-col gap-2 rounded-2xl p-4 shadow-lg border z-0"
+              className="absolute bottom-12 -right-4 xl:-right-12 hidden lg:flex flex-col justify-center gap-2 min-h-30 rounded-2xl p-4 shadow-lg border z-0"
               style={{
                 borderColor: "var(--color-border)",
                 background: "var(--color-card)",
@@ -217,22 +198,22 @@ export const HeroSection = () => {
                 opacity: 0.95,
               }}
             >
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 w-full">
                 <div
-                  className="w-10 h-10 rounded-full flex items-center justify-center shrink-0"
+                  className="w-14 h-14 rounded-full flex items-center justify-center shrink-0"
                   style={{
                     background: "var(--color-primary-light)",
                     color: "var(--color-primary)",
                   }}
                 >
-                  <Calculator size={20} />
+                  <Calculator size={26} />
                 </div>
-                <div className="text-left max-w-[140px]">
-                  <p className="text-[13px] font-bold">
+                <div className="text-left w-50">
+                  <p className="text-lg font-serif font-medium">
                     {t("HOME.HERO_CARD_CALC_TITLE")}
                   </p>
                   <p
-                    className="text-[11px] leading-snug mt-0.5"
+                    className="text-[13px] leading-snug mt-0.5"
                     style={{ color: "var(--color-muted-foreground)" }}
                   >
                     {t("HOME.HERO_CARD_CALC_DESC")}
@@ -243,7 +224,7 @@ export const HeroSection = () => {
 
             {/* Floating Middle Left Card: AI */}
             <div
-              className="absolute top-[40%] -left-8 xl:-left-24 hidden lg:flex flex-col gap-2 rounded-2xl p-4 shadow-lg border z-0"
+              className="absolute top-[40%] -left-8 xl:-left-24 hidden lg:flex flex-col justify-center gap-2 min-h-30 rounded-2xl p-4 shadow-lg border z-0"
               style={{
                 borderColor: "var(--color-border)",
                 background: "var(--color-card)",
@@ -251,22 +232,22 @@ export const HeroSection = () => {
                 opacity: 0.95,
               }}
             >
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 w-full">
                 <div
-                  className="w-10 h-10 rounded-full flex items-center justify-center shrink-0"
+                  className="w-14 h-14 rounded-full flex items-center justify-center shrink-0"
                   style={{
                     background: "var(--color-primary-light)",
                     color: "var(--color-primary)",
                   }}
                 >
-                  <Sparkles size={20} />
+                  <Sparkles size={26} />
                 </div>
-                <div className="text-left max-w-[140px]">
-                  <p className="text-[13px] font-bold">
+                <div className="text-left w-50">
+                  <p className="text-lg font-serif font-medium">
                     {t("HOME.HERO_CARD_AI_TITLE")}
                   </p>
                   <p
-                    className="text-[11px] leading-snug mt-0.5"
+                    className="text-[13px] leading-snug mt-0.5"
                     style={{ color: "var(--color-muted-foreground)" }}
                   >
                     {t("HOME.HERO_CARD_AI_DESC")}
@@ -277,7 +258,7 @@ export const HeroSection = () => {
 
             {/* Floating Middle Right Card: Data */}
             <div
-              className="absolute top-[50%] -right-8 xl:-right-20 hidden lg:flex flex-col gap-2 rounded-2xl p-4 shadow-lg border z-0"
+              className="absolute top-[40%] -right-8 xl:-right-20 hidden lg:flex flex-col justify-center gap-2 min-h-30 rounded-2xl p-4 shadow-lg border z-0"
               style={{
                 borderColor: "var(--color-border)",
                 background: "var(--color-card)",
@@ -285,22 +266,22 @@ export const HeroSection = () => {
                 opacity: 0.95,
               }}
             >
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 w-full">
                 <div
-                  className="w-10 h-10 rounded-full flex items-center justify-center shrink-0"
+                  className="w-14 h-14 rounded-full flex items-center justify-center shrink-0"
                   style={{
                     background: "var(--color-primary-light)",
                     color: "var(--color-primary)",
                   }}
                 >
-                  <ShieldCheck size={20} />
+                  <ShieldCheck size={26} />
                 </div>
-                <div className="text-left max-w-[140px]">
-                  <p className="text-[13px] font-bold">
+                <div className="text-left w-50">
+                  <p className="text-lg font-serif font-medium">
                     {t("HOME.HERO_CARD_DATA_TITLE")}
                   </p>
                   <p
-                    className="text-[11px] leading-snug mt-0.5"
+                    className="text-[13px] leading-snug mt-0.5"
                     style={{ color: "var(--color-muted-foreground)" }}
                   >
                     {t("HOME.HERO_CARD_DATA_DESC")}
