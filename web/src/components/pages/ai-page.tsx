@@ -16,7 +16,11 @@ export function AiPage() {
           </span>
           <span
             className="text-[12px] px-3 py-1 rounded-full"
-            style={{ background: "var(--color-announcement)" }}
+            style={{
+              background: "var(--color-announcement)",
+              color: "var(--color-foreground)",
+              border: "1px solid var(--color-border)",
+            }}
           >
             {t("PAGES.AI_BADGE")}
           </span>

@@ -26,13 +26,27 @@ export function AiCalculator() {
       ? "var(--color-destructive)"
       : left < 100
         ? "var(--color-warning)"
-        : "rgba(0,0,0,0.5)";
+        : "var(--color-muted-foreground)";
+
+  const examples = [
+    "makaron 200g gotowany, mięso mielone 150g smażone, przecier pomidorowy 100g",
+    "ryż 180g gotowany, pierś z kurczaka 160g smażona, oliwa łyżka",
+    "ziemniaki 250g gotowane, masło 10g, jogurt 50g",
+  ] as const;
 
   const submit = async () => {
     // Normalizacja inputu: collapse whitespace & trim
     const normalizedText = text.replace(/\s+/g, " ").trim();
 
     if (normalizedText.length === 0 || normalizedText.length > MAX) {
+      if (normalizedText.length === 0) {
+        setError(
+          t(
+            "AI.EMPTY_INPUT",
+            "Wpisz składniki (np. wybierz przykład poniżej).",
+          ),
+        );
+      }
       if (normalizedText.length > MAX) {
         // @ts-expect-error - i18n arguments typing bypass
         setError(t("AI.CHAR_LIMIT_EXCEEDED", { max: MAX }));
@@ -72,6 +86,26 @@ export function AiCalculator() {
   return (
     <>
       <div className="mt-8 md:mt-10 card-soft p-5 md:p-8">
+        <div className="flex flex-col gap-3 mb-4">
+          <p className="text-[14px] leading-relaxed text-(--color-muted-foreground)">
+            {t(
+              "AI.INSTRUCTIONS",
+              "Wpisz składniki z ilością i obróbką (gotowane/smażone/pieczone). Oddzielaj przecinkami lub nową linią.",
+            )}
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {examples.map((ex, idx) => (
+              <button
+                key={ex}
+                type="button"
+                className="pill-tab"
+                onClick={() => setText(ex)}
+              >
+                {t("AI.EXAMPLE", `Przykład ${idx + 1}`)}
+              </button>
+            ))}
+          </div>
+        </div>
         <textarea
           rows={5}
           maxLength={MAX}
@@ -85,7 +119,7 @@ export function AiCalculator() {
             className="text-[13px] shrink-0"
             style={{ color: counterColor }}
           >
-            {t("AI.CHAR_COUNT", { current: text.length, max: MAX })}
+            {t("AI.CHAR_LEFT", "Pozostało")}: {left}/{MAX}
           </span>
           <button
             onClick={submit}
@@ -117,7 +151,7 @@ export function AiCalculator() {
               {/* Top Section: Weight comparison */}
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-[11px] uppercase tracking-widest font-semibold text-(--color-muted-foreground) mb-1">
+                  <p className="text-[12px] uppercase tracking-widest font-semibold text-(--color-muted-foreground) mb-1">
                     Przed obróbką
                   </p>
                   <p className="text-3xl sm:text-4xl font-serif text-(--color-foreground)">
@@ -146,13 +180,13 @@ export function AiCalculator() {
                 </div>
 
                 <div className="text-right">
-                  <p className="text-[11px] uppercase tracking-widest font-semibold text-(--color-muted-foreground) mb-1">
+                  <p className="text-[12px] uppercase tracking-widest font-semibold text-(--color-muted-foreground) mb-1">
                     Po obróbce
                   </p>
-                  <p className="text-3xl sm:text-4xl font-serif text-[#2d6a4f]">
+                  <p className="text-3xl sm:text-4xl font-serif text-(--color-primary)">
                     {r1(result.totalGrams)} g
                   </p>
-                  <p className="text-[13px] font-medium text-[#2d6a4f] mt-1">
+                  <p className="text-[13px] font-medium text-(--color-primary) mt-1">
                     {result.totalGrams - result.rawTotalGrams > 0 ? "+" : ""}
                     {r1(result.totalGrams - result.rawTotalGrams)} g •{" "}
                     {r1(
@@ -169,7 +203,7 @@ export function AiCalculator() {
 
               {/* Macros per 100g */}
               <div>
-                <p className="text-[11px] uppercase tracking-widest font-semibold text-(--color-muted-foreground) mb-6">
+                <p className="text-[12px] uppercase tracking-widest font-semibold text-(--color-muted-foreground) mb-6">
                   Na 100g
                 </p>
                 <div className="flex flex-col gap-4">
@@ -217,8 +251,20 @@ export function AiCalculator() {
             </div>
 
             {/* Educational tip matching the dark theme if appropriate */}
-            <div className="card-soft border border-[#f5dab1] bg-[#fff9f0] p-6 rounded-2xl flex gap-5 items-start">
-              <div className="w-12 h-12 bg-[#ffe8c4] text-[#d48c29] flex items-center justify-center rounded-full shrink-0">
+            <div
+              className="card-soft p-6 rounded-2xl flex gap-5 items-start border"
+              style={{
+                borderColor: "var(--color-border)",
+                background: "var(--color-primary-muted)",
+              }}
+            >
+              <div
+                className="w-12 h-12 flex items-center justify-center rounded-full shrink-0"
+                style={{
+                  background: "var(--color-announcement)",
+                  color: "var(--color-primary)",
+                }}
+              >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="24"
@@ -233,7 +279,7 @@ export function AiCalculator() {
                   <path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 0 0 7 7z"></path>
                 </svg>
               </div>
-              <div className="text-gray-800">
+              <div className="text-(--color-foreground)">
                 <h4 className="font-semibold text-[15px]">
                   Co się stało z wagą?
                 </h4>
@@ -248,7 +294,7 @@ export function AiCalculator() {
           {/* Right Column */}
           <div className="flex flex-col gap-6">
             <div className="card-soft p-6 sm:p-8">
-              <p className="text-[11px] uppercase tracking-widest font-semibold text-(--color-muted-foreground) mb-6">
+              <p className="text-[12px] uppercase tracking-widest font-semibold text-(--color-muted-foreground) mb-6">
                 {portions > 1
                   ? t("AI.PER_PORTION", "Na 1 porcję")
                   : t("AI.FULL_MEAL", "Na całe danie")}
@@ -289,7 +335,9 @@ export function AiCalculator() {
                   const diffText =
                     diff > 0 ? `+${diff} g` : diff < 0 ? `${diff} g` : `0 g`;
                   const diffColor =
-                    diff !== 0 ? "text-[#2d6a4f]" : "text-(--color-foreground)";
+                    diff !== 0
+                      ? "text-(--color-primary)"
+                      : "text-(--color-foreground)";
 
                   return (
                     <li
@@ -367,13 +415,15 @@ function DiffRow({
   cooked: string;
 }) {
   return (
-    <div className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
-      <span className="text-[15px] text-gray-500 w-30">{label}</span>
+    <div className="flex items-center justify-between py-2 border-b border-(--color-border) last:border-0">
+      <span className="text-[14px] text-(--color-muted-foreground) w-30">
+        {label}
+      </span>
       <div className="flex items-center justify-end w-full gap-4 sm:gap-12">
-        <span className="text-[15px] text-gray-800 w-17.5 text-right font-medium">
+        <span className="text-[15px] text-(--color-foreground) w-17.5 text-right font-medium">
           {raw}
         </span>
-        <div className="w-5 h-5 rounded-full border border-gray-100 flex items-center justify-center shrink-0 text-gray-300">
+        <div className="w-5 h-5 rounded-full border border-(--color-border) flex items-center justify-center shrink-0 text-(--color-muted-foreground)">
           <svg
             width="12"
             height="12"
@@ -388,7 +438,7 @@ function DiffRow({
             <path d="m12 5 7 7-7 7" />
           </svg>
         </div>
-        <span className="text-[15px] text-gray-800 w-17.5 text-right font-medium">
+        <span className="text-[15px] text-(--color-foreground) w-17.5 text-right font-medium">
           {cooked}
         </span>
       </div>
@@ -398,9 +448,13 @@ function DiffRow({
 
 function SimpleRow({ label, v }: { label: string; v: string }) {
   return (
-    <div className="flex justify-between border-b border-gray-100 pb-2 last:border-0">
-      <span className="text-[15px] text-gray-500">{label}</span>
-      <span className="text-[15px] text-gray-800 font-medium">{v}</span>
+    <div className="flex justify-between border-b border-(--color-border) pb-2 last:border-0">
+      <span className="text-[14px] text-(--color-muted-foreground)">
+        {label}
+      </span>
+      <span className="text-[15px] text-(--color-foreground) font-medium">
+        {v}
+      </span>
     </div>
   );
 }
