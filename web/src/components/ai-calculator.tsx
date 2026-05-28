@@ -254,6 +254,12 @@ export function AiCalculator() {
                   : t("AI.FULL_MEAL", "Na całe danie")}
               </p>
               <div className="flex flex-col gap-4">
+                {portions > 1 && (
+                  <SimpleRow
+                    label={t("AI.PORTION_WEIGHT", "Waga porcji (po obróbce)")}
+                    v={`${r1(result.totalGrams / portions)} g`}
+                  />
+                )}
                 <SimpleRow
                   label={t("RESULTS.CALORIES", "Kalorie")}
                   v={`${r1(result.total.kcal / portions)} kcal`}

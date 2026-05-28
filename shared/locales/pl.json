@@ -119,7 +119,8 @@
     "METHOD_RAW": "surowe",
     "METHOD_BOILED": "gotowane",
     "METHOD_FRIED": "smażone",
-    "METHOD_BAKED": "pieczone"
+    "METHOD_BAKED": "pieczone",
+    "PORTION_WEIGHT": "Waga porcji (po obróbce)"
   },
   "HISTORY": {
     "TITLE": "Historia",

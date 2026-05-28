@@ -480,7 +480,7 @@ Core business logic endpoint. Handles LLM call via OpenRouter, product matching,
 **Internal processing flow:**
 
 ```
-1. Validate description (Zod: min 1, max 200 chars)
+1. Validate description (Zod: min 1, max 2000 chars)
 2. Extract JWT → user_id (null for anonymous)
 3. Hash client IP with salt from Supabase Vault → ip_hash
 4. Lazy cleanup: DELETE FROM ai_usage_log WHERE called_at < now() - interval '48h'

@@ -119,7 +119,8 @@
     "METHOD_RAW": "raw",
     "METHOD_BOILED": "boiled",
     "METHOD_FRIED": "fried",
-    "METHOD_BAKED": "baked"
+    "METHOD_BAKED": "baked",
+    "PORTION_WEIGHT": "Portion weight (cooked)"
   },
   "HISTORY": {
     "TITLE": "History",
