@@ -48,7 +48,6 @@ export function AiCalculator() {
         );
       }
       if (normalizedText.length > MAX) {
-        // @ts-expect-error - i18n arguments typing bypass
         setError(t("AI.CHAR_LIMIT_EXCEEDED", { max: MAX }));
       }
       return;
@@ -101,7 +100,7 @@ export function AiCalculator() {
                 className="pill-tab"
                 onClick={() => setText(ex)}
               >
-                {t("AI.EXAMPLE", `Przykład ${idx + 1}`)}
+                {`${t("AI.EXAMPLE")} ${idx + 1}`}
               </button>
             ))}
           </div>
@@ -149,85 +148,82 @@ export function AiCalculator() {
           <div className="flex flex-col gap-6">
             <div className="card-soft p-6 sm:p-8">
               {/* Top Section: Weight comparison */}
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-[12px] uppercase tracking-widest font-semibold text-(--color-muted-foreground) mb-1">
-                    Przed obróbką
-                  </p>
-                  <p className="text-3xl sm:text-4xl font-serif text-(--color-foreground)">
-                    {r1(result.rawTotalGrams)} g
-                  </p>
-                  <p className="text-[12px] text-(--color-muted-foreground) mt-1">
-                    suma składników
-                  </p>
-                </div>
+              <div>
+                <p className="text-[13px] uppercase tracking-widest text-(--color-muted-foreground) mb-6">
+                  {t("AI.AFTER_COOKING", "Po obróbce otrzymasz")}
+                </p>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="m-0 block p-0 text-[12px] tracking-wide leading-none font-medium text-(--color-muted-foreground)">
+                      {t("AI.RAW", "Surowe")}
+                    </p>
+                    <p className="m-0 block p-0 font-serif text-[48px] sm:text-[52px] md:text-[56px] leading-none text-(--color-foreground)">
+                      {r1(result.rawTotalGrams)} g
+                    </p>
+                    <p className="text-[12px] text-(--color-muted-foreground) mt-1">
+                      suma składników
+                    </p>
+                  </div>
 
-                <div className="w-10 h-10 rounded-full border border-(--color-border) flex items-center justify-center shrink-0 shadow-sm mx-4 bg-transparent">
-                  <svg
-                    width="18"
-                    height="18"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="text-(--color-muted-foreground)"
-                  >
-                    <path d="M5 12h14" />
-                    <path d="m12 5 7 7-7 7" />
-                  </svg>
-                </div>
+                  <div className="w-10 h-10 rounded-full border border-(--color-border) flex items-center justify-center shrink-0 shadow-sm mx-4 bg-transparent">
+                    <svg
+                      width="18"
+                      height="18"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="text-(--color-muted-foreground)"
+                    >
+                      <path d="M5 12h14" />
+                      <path d="m12 5 7 7-7 7" />
+                    </svg>
+                  </div>
 
-                <div className="text-right">
-                  <p className="text-[12px] uppercase tracking-widest font-semibold text-(--color-muted-foreground) mb-1">
-                    Po obróbce
-                  </p>
-                  <p className="text-3xl sm:text-4xl font-serif text-(--color-primary)">
-                    {r1(result.totalGrams)} g
-                  </p>
-                  <p className="text-[13px] font-medium text-(--color-primary) mt-1">
-                    {result.totalGrams - result.rawTotalGrams > 0 ? "+" : ""}
-                    {r1(result.totalGrams - result.rawTotalGrams)} g •{" "}
-                    {r1(
-                      ((result.totalGrams - result.rawTotalGrams) /
-                        result.rawTotalGrams) *
-                        100,
-                    )}
-                    %
-                  </p>
+                  <div className="text-right">
+                    <p className="m-0 block p-0 text-[12px] tracking-wide leading-none font-medium text-(--color-muted-foreground)">
+                      {t("AI.COOKED", "Po obróbce")}
+                    </p>
+                    <p className="m-0 block p-0 font-serif text-[48px] sm:text-[52px] md:text-[56px] leading-none text-(--color-primary)">
+                      {r1(result.totalGrams)} g
+                    </p>
+                    <p className="text-[13px] font-medium text-(--color-primary) mt-1">
+                      {result.totalGrams - result.rawTotalGrams > 0 ? "+" : ""}
+                      {r1(result.totalGrams - result.rawTotalGrams)} g •{" "}
+                      {r1(
+                        ((result.totalGrams - result.rawTotalGrams) /
+                          result.rawTotalGrams) *
+                          100,
+                      )}
+                      %
+                    </p>
+                  </div>
                 </div>
               </div>
 
               <hr className="my-8 border-t border-(--color-border)" />
 
-              {/* Macros per 100g */}
+              {/* Całe danie / Na 1 porcję */}
               <div>
-                <p className="text-[12px] uppercase tracking-widest font-semibold text-(--color-muted-foreground) mb-6">
-                  Na 100g
-                </p>
-                <div className="flex flex-col gap-4">
-                  <DiffRow
-                    label={t("RESULTS.CALORIES", "Kalorie")}
-                    raw={`${r1(result.rawPer100.kcal)} kcal`}
-                    cooked={`${r1(result.per100.kcal)} kcal`}
-                  />
-                  <DiffRow
-                    label={t("RESULTS.PROTEIN", "Białko")}
-                    raw={`${r1(result.rawPer100.protein)} g`}
-                    cooked={`${r1(result.per100.protein)} g`}
-                  />
-                  <DiffRow
-                    label={t("RESULTS.FAT", "Tłuszcz")}
-                    raw={`${r1(result.rawPer100.fat)} g`}
-                    cooked={`${r1(result.per100.fat)} g`}
-                  />
-                  <DiffRow
-                    label={t("RESULTS.CARBS", "Węglowodany")}
-                    raw={`${r1(result.rawPer100.carbs)} g`}
-                    cooked={`${r1(result.per100.carbs)} g`}
-                  />
+                <div className="flex items-center gap-3 mb-4">
+                  <p className="text-[12px] uppercase tracking-widest font-semibold text-(--color-foreground)">
+                    {t("AI.VALUES_FOR", "Wartości dla")} (
+                    {r1(result.totalGrams / portions)} g)
+                  </p>
+                  <span className="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-(--color-secondary) text-(--color-secondary-foreground) font-medium">
+                    {portions > 1
+                      ? t("AI.ONE_PORTION", "1 porcja")
+                      : t("AI.FULL_MEAL_BADGE", "Całe danie")}
+                  </span>
                 </div>
+                <MacroTiles
+                  kcal={result.total.kcal / portions}
+                  protein={result.total.protein / portions}
+                  fat={result.total.fat / portions}
+                  carbs={result.total.carbs / portions}
+                />
               </div>
 
               <hr className="my-8 border-t border-(--color-border)" />
@@ -294,35 +290,15 @@ export function AiCalculator() {
           {/* Right Column */}
           <div className="flex flex-col gap-6">
             <div className="card-soft p-6 sm:p-8">
-              <p className="text-[12px] uppercase tracking-widest font-semibold text-(--color-muted-foreground) mb-6">
-                {portions > 1
-                  ? t("AI.PER_PORTION", "Na 1 porcję")
-                  : t("AI.FULL_MEAL", "Na całe danie")}
+              <p className="text-[12px] uppercase tracking-widest font-semibold text-(--color-foreground) mb-4">
+                {t("AI.FOR_100G", "Dla 100 g")}
               </p>
-              <div className="flex flex-col gap-4">
-                {portions > 1 && (
-                  <SimpleRow
-                    label={t("AI.PORTION_WEIGHT", "Waga porcji (po obróbce)")}
-                    v={`${r1(result.totalGrams / portions)} g`}
-                  />
-                )}
-                <SimpleRow
-                  label={t("RESULTS.CALORIES", "Kalorie")}
-                  v={`${r1(result.total.kcal / portions)} kcal`}
-                />
-                <SimpleRow
-                  label={t("RESULTS.PROTEIN", "Białko")}
-                  v={`${r1(result.total.protein / portions)} g`}
-                />
-                <SimpleRow
-                  label={t("RESULTS.FAT", "Tłuszcz")}
-                  v={`${r1(result.total.fat / portions)} g`}
-                />
-                <SimpleRow
-                  label={t("RESULTS.CARBS", "Węglowodany")}
-                  v={`${r1(result.total.carbs / portions)} g`}
-                />
-              </div>
+              <MacroTiles
+                kcal={result.per100.kcal}
+                protein={result.per100.protein}
+                fat={result.per100.fat}
+                carbs={result.per100.carbs}
+              />
             </div>
 
             <div className="card-soft p-6 sm:p-8">
@@ -391,70 +367,79 @@ export function AiCalculator() {
   );
 }
 
-function Row({ label, v }: { label: string; v: string }) {
-  return (
-    <div className="flex justify-between border-b border-(--color-border) pb-2">
-      <span
-        className="text-[14px]"
-        style={{ color: "var(--color-muted-foreground)" }}
-      >
-        {label}
-      </span>
-      <span className="text-[15px] font-medium">{v}</span>
-    </div>
-  );
-}
-
-function DiffRow({
+function MacroTile({
   label,
-  raw,
-  cooked,
+  value,
+  unit,
+  highlight = false,
 }: {
   label: string;
-  raw: string;
-  cooked: string;
+  value: string | number;
+  unit?: string;
+  highlight?: boolean;
 }) {
   return (
-    <div className="flex items-center justify-between py-2 border-b border-(--color-border) last:border-0">
-      <span className="text-[14px] text-(--color-muted-foreground) w-30">
+    <div
+      className={`rounded-2xl border flex flex-col ${
+        highlight
+          ? "border-primary/30 bg-(--color-primary-muted)"
+          : "border-(--color-border) bg-white"
+      } p-3.5`}
+    >
+      <span className="text-[12px] uppercase tracking-wide font-medium leading-tight mb-2 text-(--color-muted-foreground)">
         {label}
       </span>
-      <div className="flex items-center justify-end w-full gap-4 sm:gap-12">
-        <span className="text-[15px] text-(--color-foreground) w-17.5 text-right font-medium">
-          {raw}
-        </span>
-        <div className="w-5 h-5 rounded-full border border-(--color-border) flex items-center justify-center shrink-0 text-(--color-muted-foreground)">
-          <svg
-            width="12"
-            height="12"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M5 12h14" />
-            <path d="m12 5 7 7-7 7" />
-          </svg>
-        </div>
-        <span className="text-[15px] text-(--color-foreground) w-17.5 text-right font-medium">
-          {cooked}
-        </span>
-      </div>
+      <p
+        className={`font-bold leading-none text-[22px] ${
+          highlight ? "text-(--color-primary)" : "text-(--color-foreground)"
+        }`}
+      >
+        <span className="tabular-nums">{value}</span>
+      </p>
+      {unit && (
+        <p className="text-[12px] mt-1 text-(--color-muted-foreground)">
+          {unit}
+        </p>
+      )}
     </div>
   );
 }
 
-function SimpleRow({ label, v }: { label: string; v: string }) {
+function MacroTiles({
+  kcal,
+  protein,
+  fat,
+  carbs,
+}: {
+  kcal: number;
+  protein: number;
+  fat: number;
+  carbs: number;
+}) {
+  const { t } = useTranslation();
   return (
-    <div className="flex justify-between border-b border-(--color-border) pb-2 last:border-0">
-      <span className="text-[14px] text-(--color-muted-foreground)">
-        {label}
-      </span>
-      <span className="text-[15px] text-(--color-foreground) font-medium">
-        {v}
-      </span>
+    <div className="grid grid-cols-2 gap-4">
+      <MacroTile
+        label={t("RESULTS.CALORIES", "Kalorie")}
+        value={r1(kcal)}
+        unit="kcal"
+        highlight
+      />
+      <MacroTile
+        label={t("RESULTS.PROTEIN", "Białko")}
+        value={r1(protein)}
+        unit="g"
+      />
+      <MacroTile
+        label={t("RESULTS.FAT_PLURAL", "Tłuszcze")}
+        value={r1(fat)}
+        unit="g"
+      />
+      <MacroTile
+        label={t("RESULTS.CARBS", "Węglowodany")}
+        value={r1(carbs)}
+        unit="g"
+      />
     </div>
   );
 }
