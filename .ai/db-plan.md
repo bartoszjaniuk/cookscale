@@ -582,12 +582,12 @@ await supabase
 
 ```
 Użytkownik
-    │ tekst przepisu (max 200 znaków)
+    │ tekst przepisu (max 3000 znaków)
     ▼
 Edge Function (Supabase Deno)
     │ Walidacja JWT + limit rate (ai_usage_log)
     │ Sprawdzenie is_premium / trial_ai_used_at
-    │ Prompt z enumem 3 cooking_method slugs (boiling, frying, baking)
+    │ Prompt z enumem 4 cooking_method slugs (boiling, frying, baking, none)
     ▼
 OpenRouter AI (LLM)
     │ [{ingredient_name, cooking_method_slug, raw_weight_g, cooked_weight_g}]
@@ -600,7 +600,13 @@ Edge Function — mapowanie i walidacja
     └─ kalkulacja makro deterministycznie z tabeli products
     │
     ▼
-calculations (INSERT via service_role)
+Wynik wysyłany do klienta (API /calculate-dish)
+
+(Opcjonalnie) Użytkownik edytuje składniki w tabeli i ponownie przelicza (API /recalculate-dish)
+
+(Opcjonalnie) Użytkownik zapisuje do historii 
+    ▼
+calculations (INSERT via service_role API /save-dish-calculation)
     result JSONB — tablica items + total + per_100g
     warnings JSONB — nierozpoznane składniki
 ```

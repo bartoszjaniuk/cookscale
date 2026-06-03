@@ -72,7 +72,11 @@
 		"RATE_LIMIT": "Przekroczono limit wywołań. Spróbuj ponownie za {{time}}.",
 		"UNKNOWN_INGREDIENT": "Nie rozpoznano: {{name}} – pomiń go lub spróbuj z inną nazwą",
 		"GENERIC": "Wystąpił błąd. Spróbuj ponownie.",
-		"REQUIRED_METHOD": "Wybierz metodę obróbki termicznej"
+		"REQUIRED_METHOD": "Wybierz metodę obróbki termicznej",
+		"TRIAL_EXHAUSTED": "Wykorzystałeś darmowe obliczenie AI. Zarejestruj się lub wykup Premium.",
+		"PREMIUM_REQUIRED": "Wykup Premium, aby korzystać z trybu AI.",
+		"INVALID_TOKEN": "Sesja wygasła. Zaloguj się ponownie.",
+		"DESCRIPTION_TOO_LONG": "Opis jest za długi (maks. {{max}} znaków)."
 	},
 	"AUTH": {
 		"SIGN_IN": "Zaloguj się",
@@ -126,8 +130,13 @@
 		"FULL_MEAL": "Całe danie",
 		"PER_100G": "Na 100g dania",
 		"PORTIONS_LABEL": "Podział na porcje",
-		"RECOGNIZED_ITEMS": "Rozpoznane składniki",
+		"INGREDIENTS": "Składniki",
+		"SAVE_TO_HISTORY": "Zapisz do historii",
+		"METHOD_NONE": "Bez obróbki",
+		"SELECT_METHOD": "Wybierz...",
+		"COOKING_METHOD_REQUIRED": "Wybierz metodę obróbki dla tego składnika.",
 		"UNRECOGNIZED_PREFIX": "⚠️ Nie rozpoznano:",
+		"DEV_NUTRITION_SOURCE": "Dane z {{source}}",
 		"PARTIAL_RESULT": "Wynik częściowy.",
 		"METHOD_RAW": "surowe",
 		"METHOD_BOILED": "gotowane",

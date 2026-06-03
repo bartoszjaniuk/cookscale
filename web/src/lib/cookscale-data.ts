@@ -1,7 +1,7 @@
 // Canonical foods (raw, per 100g) — names in English; UI translates if needed.
 // Macros are illustrative MVP values inspired by USDA. Replace with sourced data in production.
 
-export type Method = "boiling" | "frying" | "baking";
+export type Method = "boiling" | "frying" | "baking" | "none";
 
 export type Food = {
   id: string;

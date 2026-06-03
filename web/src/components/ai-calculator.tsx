@@ -1,22 +1,39 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { TFunction } from "i18next";
-import { FOODS, macrosForGrams, r1, type Method } from "@/lib/cookscale-data";
+import { r1, type Method } from "@/lib/cookscale-data";
+import {
+  calculateDish,
+  type AiEstimateResult,
+  type CalculateDishApiError,
+} from "@/lib/calculate-dish";
+import { createSupabaseBrowserClient } from "@/lib/supabase";
+import { DishIngredientsTable } from "./dish-ingredients-table";
 
-const MAX = 800;
+import { AppProviders } from "@/providers/AppProviders";
+
+const MAX = 3000;
+const supabase = createSupabaseBrowserClient();
 
 export type TranslationFunction = TFunction;
 export type TranslationKey = Parameters<TranslationFunction>[0];
 
-type EstimateResult = ReturnType<typeof mockEstimate>;
-
 export function AiCalculator() {
-  const { t } = useTranslation();
+  return (
+    <AppProviders>
+      <AiCalculatorInner />
+    </AppProviders>
+  );
+}
+
+function AiCalculatorInner() {
+  const { t, i18n } = useTranslation();
+  const language = i18n.language.startsWith("en") ? "en" : "pl";
   const [text, setText] = useState(
     "makaron 200g gotowany, mięso mielone 150g smażone, przecier pomidorowy 100g, oliwa łyżka",
   );
   const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState<EstimateResult | null>(null);
+  const [result, setResult] = useState<AiEstimateResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [portions, setPortions] = useState<number>(1);
 
@@ -59,22 +76,20 @@ export function AiCalculator() {
     setPortions(1);
 
     try {
-      const res = await fetch("/api/ai", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        // Na razie mock data, wywołujemy API ale możemy używać mockEstimate
-        body: JSON.stringify({ text: normalizedText }),
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      const outcome = await calculateDish(normalizedText, {
+        language,
+        accessToken: session?.access_token ?? null,
       });
 
-      console.log("API response", res);
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
-        setError((data as { error?: string }).error ?? t("ERRORS.GENERIC"));
+      if ("error" in outcome) {
+        setError(formatCalculateDishError(t, outcome.error));
         return;
       }
 
-      const data = (await res.json()) as EstimateResult;
-      setResult(data);
+      setResult(outcome.data);
     } catch {
       setError(t("ERRORS.NO_CONNECTION"));
     } finally {
@@ -301,65 +316,11 @@ export function AiCalculator() {
               />
             </div>
 
-            <div className="card-soft p-6 sm:p-8">
-              <h4 className="font-medium text-[15px] mb-4 text-(--color-foreground)">
-                {t("AI.RECOGNIZED_ITEMS", "Rozpoznane składniki")}
-              </h4>
-              <ul className="flex flex-col">
-                {result.items.map((it, i) => {
-                  const diff = it.grams - it.rawGrams;
-                  const diffText =
-                    diff > 0 ? `+${diff} g` : diff < 0 ? `${diff} g` : `0 g`;
-                  const diffColor =
-                    diff !== 0
-                      ? "text-(--color-primary)"
-                      : "text-(--color-foreground)";
-
-                  return (
-                    <li
-                      key={i}
-                      className="flex items-center justify-between py-4 border-b border-(--color-border) last:border-0"
-                    >
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <span className="text-[15px] font-medium text-(--color-foreground)">
-                            {it.name}
-                          </span>
-                          {import.meta.env.DEV && it.source === "USDA" && (
-                            <span className="text-[10px] bg-blue-100 text-blue-800 px-2 py-0.5 rounded uppercase">
-                              USDA
-                            </span>
-                          )}
-                        </div>
-                        <p className="text-[13px] mt-1 text-(--color-muted-foreground)">
-                          {it.rawGrams} g · {getMethodLabel(t, it.method)}
-                        </p>
-                      </div>
-                      <div className="flex items-center gap-4 sm:gap-6">
-                        <span
-                          className={`text-[13px] font-medium ${diffColor} text-right w-12`}
-                        >
-                          {diffText}
-                        </span>
-                        <span className="text-[15px] font-medium text-(--color-foreground) text-right w-16 whitespace-nowrap">
-                          {r1(it.macros.kcal)} kcal
-                        </span>
-                      </div>
-                    </li>
-                  );
-                })}
-              </ul>
-              {result.unrecognized.length > 0 && (
-                <div
-                  className="mt-4 rounded-2xl px-5 py-4 text-[14px]"
-                  style={{ background: "var(--color-announcement)" }}
-                >
-                  {t("AI.UNRECOGNIZED_PREFIX")}{" "}
-                  <strong>{result.unrecognized.join(", ")}</strong>.{" "}
-                  {t("AI.PARTIAL_RESULT")}
-                </div>
-              )}
-            </div>
+            <DishIngredientsTable
+              result={result}
+              description={text}
+              onUpdateResult={setResult}
+            />
           </div>
         </div>
       )}
@@ -444,157 +405,34 @@ function MacroTiles({
   );
 }
 
-function getMethodLabel(
+
+function formatCalculateDishError(
   t: TranslationFunction,
-  m: Method | null | undefined,
+  apiError: CalculateDishApiError,
 ): string {
-  if (!m) return t("AI.METHOD_RAW");
-  return m === "boiling"
-    ? t("AI.METHOD_BOILED")
-    : m === "frying"
-      ? t("AI.METHOD_FRIED")
-      : t("AI.METHOD_BAKED");
-}
-
-function methodPL(m: Method) {
-  return m === "boiling" ? "gotowane" : m === "frying" ? "smażone" : "pieczone";
-}
-
-// Fallback local mock — used only if the API route is unavailable in development.
-function mockEstimate(input: string) {
-  const text = input.toLowerCase();
-  const items: {
-    name: string;
-    grams: number;
-    rawGrams: number;
-    method: Method | null;
-    macros: { kcal: number; protein: number; fat: number; carbs: number };
-    source?: "Lokalna Baza" | "USDA";
-  }[] = [];
-  const unrecognized: string[] = [];
-
-  const parts = text
-    .split(/[,;\n]/)
-    .map((s) => s.trim())
-    .filter(Boolean);
-
-  for (const part of parts) {
-    const gramsMatch = part.match(/(\d+(?:[.,]\d+)?)\s*g/);
-    const tbspMatch = !gramsMatch && /łyżka|łyżk/.test(part);
-    const grams = gramsMatch
-      ? Number(gramsMatch[1].replace(",", "."))
-      : tbspMatch
-        ? 12
-        : 0;
-
-    const method: Method | null = /piecz|pieczone/.test(part)
-      ? "baking"
-      : /smaż|smażone/.test(part)
-        ? "frying"
-        : /gotow/.test(part)
-          ? "boiling"
-          : null;
-
-    const food = FOODS.find(
-      (f) =>
-        part.includes(f.pl.toLowerCase()) ||
-        part.includes(f.name.toLowerCase()),
-    );
-
-    if (!food || grams <= 0) {
-      const label = part.replace(/\d+\s*g/, "").trim();
-      // MOCK behaviour: if it has 'wołowina' or 'ciecierzyca' act as if USDA retrieved it.
-      if (label && /(wołowina|ciecierzyca)/i.test(label) && grams > 0) {
-        items.push({
-          name: label.charAt(0).toUpperCase() + label.slice(1),
-          grams: grams,
-          rawGrams: grams,
-          method,
-          macros: {
-            kcal: grams * 2.5,
-            protein: grams * 0.2,
-            fat: grams * 0.1,
-            carbs: 0,
-          },
-          source: "USDA",
-        });
-        continue;
-      }
-      if (label) unrecognized.push(label);
-      continue;
+  switch (apiError.error) {
+    case "trial_exhausted":
+      return t("ERRORS.TRIAL_EXHAUSTED");
+    case "premium_required":
+      return apiError.message ?? t("ERRORS.PREMIUM_REQUIRED");
+    case "rate_limit_exceeded": {
+      const resetAt = apiError.reset_at
+        ? new Date(apiError.reset_at).toLocaleTimeString()
+        : "";
+      return t("ERRORS.RATE_LIMIT", { time: resetAt });
     }
-
-    const cookedGrams = method ? grams * food.yields[method] : grams;
-    items.push({
-      name: food.pl,
-      grams: Math.round(cookedGrams),
-      rawGrams: grams,
-      method,
-      macros: macrosForGrams(food, grams),
-      source: "Lokalna Baza",
-    });
+    case "invalid_token":
+      return t("ERRORS.INVALID_TOKEN");
+    case "description_required":
+      return t(
+        "AI.EMPTY_INPUT",
+        "Wpisz składniki (np. wybierz przykład poniżej).",
+      );
+    case "description_too_long":
+      return t("ERRORS.DESCRIPTION_TOO_LONG", { max: MAX });
+    case "ai_service_error":
+      return t("ERRORS.AI_FAILED");
+    default:
+      return t("ERRORS.GENERIC");
   }
-
-  if (/oliw|olej/.test(text) && !items.find((i) => /oliw|olej/i.test(i.name))) {
-    const g = /łyżka|łyżk/.test(text) ? 12 : 10;
-    items.push({
-      name: "Oliwa",
-      grams: g,
-      rawGrams: g,
-      method: null,
-      macros: { kcal: 9 * g, protein: 0, fat: g, carbs: 0 },
-    });
-  }
-
-  const total = items.reduce(
-    (a, b) => ({
-      kcal: a.kcal + b.macros.kcal,
-      protein: a.protein + b.macros.protein,
-      fat: a.fat + b.macros.fat,
-      carbs: a.carbs + b.macros.carbs,
-    }),
-    { kcal: 0, protein: 0, fat: 0, carbs: 0 },
-  );
-
-  const totalGrams = items.reduce((a, b) => a + b.grams, 0);
-  const rawTotalGrams = items.reduce((a, b) => {
-    // Odwracamy wagę używając wydajności z mocka
-    if (b.method && b.grams > 0) {
-      const food = FOODS.find((f) => f.pl === b.name);
-      if (food && food.yields[b.method]) {
-        return a + b.grams / food.yields[b.method];
-      }
-    }
-    return a + b.grams;
-  }, 0);
-
-  const per100 =
-    totalGrams > 0
-      ? {
-          kcal: (total.kcal / totalGrams) * 100,
-          protein: (total.protein / totalGrams) * 100,
-          fat: (total.fat / totalGrams) * 100,
-          carbs: (total.carbs / totalGrams) * 100,
-        }
-      : { kcal: 0, protein: 0, fat: 0, carbs: 0 };
-
-  const rawPer100 =
-    rawTotalGrams > 0
-      ? {
-          kcal: (total.kcal / rawTotalGrams) * 100,
-          protein: (total.protein / rawTotalGrams) * 100,
-          fat: (total.fat / rawTotalGrams) * 100,
-          carbs: (total.carbs / rawTotalGrams) * 100,
-        }
-      : { kcal: 0, protein: 0, fat: 0, carbs: 0 };
-
-  return {
-    items,
-    unrecognized,
-    total,
-    totalGrams,
-    rawTotalGrams,
-    per100,
-    rawPer100,
-  };
 }

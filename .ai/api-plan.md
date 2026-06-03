@@ -475,12 +475,12 @@ Core business logic endpoint. Handles LLM call via OpenRouter, product matching,
 
 | Field         | Type   | Constraints                |
 | ------------- | ------ | -------------------------- |
-| `description` | string | Required, 1–200 characters |
+| `description` | string | Required, 1–3000 characters |
 
 **Internal processing flow:**
 
 ```
-1. Validate description (Zod: min 1, max 2000 chars)
+1. Validate description (Zod: min 1, max 3000 chars)
 2. Extract JWT → user_id (null for anonymous)
 3. Hash client IP with salt from Supabase Vault → ip_hash
 4. Lazy cleanup: DELETE FROM ai_usage_log WHERE called_at < now() - interval '48h'
@@ -499,10 +499,9 @@ Core business logic endpoint. Handles LLM call via OpenRouter, product matching,
    d. If no factor row: use yield_source "ai" (LLM-provided cooked weight), add warning
 10. Calculate macros deterministically from products table values
 11. Aggregate totals (total_weight_g, total macros, per_100g macros)
-12. INSERT into calculations (service_role) — only if user is authenticated
-13. UPDATE profiles SET trial_ai_used_at = now() — if first AI call for authenticated Free user (service_role)
-14. INSERT into ai_usage_log (ip_hash, user_id, success = true) — via service_role
-15. Return result
+12. UPDATE profiles SET trial_ai_used_at = now() — if first AI call for authenticated Free user (service_role)
+13. INSERT into ai_usage_log (ip_hash, user_id, success = true) — via service_role
+14. Return result (calculation_id is always null, save is manual via /save-dish-calculation)
 ```
 
 **Success 200:**
@@ -526,6 +525,8 @@ Core business logic endpoint. Handles LLM call via OpenRouter, product matching,
 	"items": [
 		{
 			"product_id": "uuid",
+			"name_en": "Chicken Breast",
+			"name_pl": "Pierś z kurczaka",
 			"product_name": "chicken breast",
 			"cooking_method_slug": "baking",
 			"raw_weight_g": 200,
@@ -542,6 +543,8 @@ Core business logic endpoint. Handles LLM call via OpenRouter, product matching,
 		},
 		{
 			"product_id": "uuid",
+			"name_en": "Potato",
+			"name_pl": "Ziemniak",
 			"product_name": "potato",
 			"cooking_method_slug": "boiling",
 			"raw_weight_g": 300,
@@ -608,26 +611,53 @@ Core business logic endpoint. Handles LLM call via OpenRouter, product matching,
 
 ---
 
+#### `POST /functions/v1/save-dish-calculation`
+
+Saves the result of a dish calculation (after manual edits in UI) to the `calculations` table.
+The actual macro recalculation when users edit ingredients happens client-side; this endpoint is only used to persist the final state.
+
+**Headers:**
+
+- `apikey: <anon_key>` (required)
+- `Authorization: Bearer <jwt>` (required)
+- `Content-Type: application/json`
+
+**Request body:**
+
+```json
+{
+	"description": "...",
+	"result": { ... },
+	"language": "pl"
+}
+```
+
+---
+
 #### OpenRouter prompt design (internal)
 
 The Edge Function sends a **system + user** prompt to OpenRouter:
 
 ```
 System:
-You are a nutritional parsing assistant. Given a dish description, extract each ingredient
-and return ONLY a JSON array. Each element must have:
-  - "name": ingredient name in English (lowercase)
-  - "cooking_method": one of exactly ["boiling", "frying", "baking"]
-  - "weight_g": numeric weight as described by user (assume raw weight unless explicitly stated as cooked)
+You are a nutritional parsing assistant. Given a dish description, extract the overall dish context and each ingredient.
+Return ONLY a JSON object with two keys: "dish_context" and "ingredients".
 
-If a cooking method is unspecified, infer the most common method for that ingredient.
+"dish_context" object MUST have:
+  - "default_cooking_method": one of exactly ["boiling", "frying", "baking"], derived from the overall dish description.
+
+"ingredients" array MUST contain objects with:
+  - "name": ingredient name in English (lowercase)
+  - "weight_g": numeric weight as described by user (assume raw weight unless explicitly stated as cooked)
+  - "cooking_method": ONLY if this specific ingredient is cooked differently than the default_cooking_method. Must be one of ["boiling", "frying", "baking"].
+
 Return valid JSON only. No markdown. No explanation.
 
 User:
 {description}
 ```
 
-The response is validated with a Zod schema before processing. Parsing failures surface as `ai_service_error`.
+The response is parsed leniently. If `cooking_method` is omitted on an ingredient, it inherits the `default_cooking_method` from the `dish_context`. Parsing failures surface as `ai_service_error`.
 
 ---
 

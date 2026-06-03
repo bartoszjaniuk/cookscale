@@ -72,7 +72,11 @@
 		"RATE_LIMIT": "Request limit exceeded. Try again in {{time}}.",
 		"UNKNOWN_INGREDIENT": "Not recognized: {{name}} – skip it or try a different name",
 		"GENERIC": "Something went wrong. Please try again.",
-		"REQUIRED_METHOD": "Select a cooking method"
+		"REQUIRED_METHOD": "Select a cooking method",
+		"TRIAL_EXHAUSTED": "You have used your free AI calculation. Sign up or upgrade to Premium.",
+		"PREMIUM_REQUIRED": "Upgrade to Premium to use AI mode.",
+		"INVALID_TOKEN": "Session expired. Please sign in again.",
+		"DESCRIPTION_TOO_LONG": "Description is too long (max {{max}} characters)."
 	},
 	"AUTH": {
 		"SIGN_IN": "Sign in",
@@ -126,8 +130,13 @@
 		"FULL_MEAL": "Full meal",
 		"PER_100G": "Per 100g of meal",
 		"PORTIONS_LABEL": "Split into portions",
-		"RECOGNIZED_ITEMS": "Recognized ingredients",
+		"INGREDIENTS": "Ingredients",
+		"SAVE_TO_HISTORY": "Save to history",
+		"METHOD_NONE": "No cooking",
+		"SELECT_METHOD": "Select...",
+		"COOKING_METHOD_REQUIRED": "Select a cooking method for this ingredient.",
 		"UNRECOGNIZED_PREFIX": "⚠️ Not recognized:",
+		"DEV_NUTRITION_SOURCE": "Data from {{source}}",
 		"PARTIAL_RESULT": "Partial result.",
 		"METHOD_RAW": "raw",
 		"METHOD_BOILED": "boiled",

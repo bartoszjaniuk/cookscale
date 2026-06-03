@@ -88,7 +88,7 @@ Docelowy użytkownik to osoba dbająca o dietę, śledząca kalorie i makro, kor
 
 ### 3.2 Tryb „dania z AI" (Premium + 1 trial)
 
-- Pole tekstowe z limitem **800 znaków** (surowy input) i progresywnym licznikiem znaków widocznym w polu tekstowym
+- Pole tekstowe z limitem **3000 znaków** (surowy input) i progresywnym licznikiem znaków widocznym w polu tekstowym
 - Użytkownik wpisuje opis dania lub wkleja przepis w języku naturalnym (np. „makaron 200g, mięso mielone 150g, przecier pomidorowy 100g, oliwa łyżka" albo wieloliniowy przepis)
 - **Normalizacja inputu po stronie klienta przed wysłaniem do backendu**: usunięcie wielokrotnych spacji, tabulatorów, nadmiarowych nowych linii (collapse whitespace), trim — zmniejsza liczbę tokenów wysyłanych do LLM bez utraty informacji dla użytkownika
 - Wywołanie LLM przez OpenRouter – konkretny model do wskazania przez właściciela projektu
@@ -98,8 +98,8 @@ Docelowy użytkownik to osoba dbająca o dietę, śledząca kalorie i makro, kor
   - Makro na 100g dania
   - **Podział na porcje**: użytkownik może dynamicznie wprowadzić liczbę porcji, a UI przelicza wyniki na podstawie już zwróconych danych (bez ponownego wywołania LLM)
 - Obsługa błędów AI przy nierozpoznanym składniku:
-  - Zwracany jest częściowy wynik dla rozpoznanych składników z ostrzeżeniem (nie blokuje całego obliczenia)
-  - Jeśli dane składnika nie są dostępne lokalnie, LLM pobiera dane odżywcze z zewnętrznego źródła (priorytetowo USDA FoodData Central)
+  - Zawsze zwracany jest caly wynik dania z informacją o nie rozpoznanych skladnikach (nie blokuje całego obliczenia)
+  - Jeśli dane składnika nie są dostępne lokalnie, LLM pobiera dane odżywcze z zewnętrznego źródła (priorytetowo USDA FoodData Central), jesli go tam nie znajdzie z moze byc z innego zrodla, ale musi zapisac jakie to zrodlo.
   - Informacja o źródle danych (np. „Dane dla [składnik] pobrane z USDA") wyświetlana jest użytkownikowi wyłącznie w trybie `__DEV__`
 - 1 darmowy trial powiązany z device ID (mobile) / IP (przeglądarka), dostępny przed rejestracją
 - Po wyczerpaniu trialu: ekran rejestracji z komunikatem „Zarejestruj się, aby odblokować więcej obliczeń"
@@ -329,9 +329,9 @@ Tytuł: Wprowadzenie opisu dania w języku naturalnym
 Opis: Jako użytkownik Premium, chcę wpisać opis mojego dania lub wkleić przepis w zwykłym języku (np. „pierś z kurczaka 200g pieczona, ziemniaki 300g gotowane, brokuł 150g na parze"), aby AI automatycznie obliczył makro całego posiłku.
 Kryteria akceptacji:
 
-- W trybie AI dostępne jest pole tekstowe z limitem 800 znaków (surowy input)
-- Progresywny licznik znaków jest widoczny w polu tekstowym i zmienia kolor lub styl, gdy użytkownik zbliża się do limitu (np. przy >700 znaków)
-- Użytkownik nie może wprowadzić więcej niż 800 znaków (blokada lub odcięcie na poziomie UI)
+- W trybie AI dostępne jest pole tekstowe z limitem 3000 znaków (surowy input)
+- Progresywny licznik znaków jest widoczny w polu tekstowym i zmienia kolor lub styl, gdy użytkownik zbliża się do limitu (np. przy >2800 znaków)
+- Użytkownik nie może wprowadzić więcej niż 3000 znaków (blokada lub odcięcie na poziomie UI)
 - Przed wysłaniem do backendu aplikacja normalizuje input po stronie klienta: collapse whitespace (wielokrotne spacje, tabulatory, nadmiarowe nowe linie → pojedyncza spacja lub nowa linia), trim początku i końca
 - Backend waliduje znormalizowany tekst i odrzuca żądania przekraczające dopuszczalną długość
 - Po zatwierdzeniu aplikacja wysyła znormalizowany opis do backendu, który wywołuje LLM przez OpenRouter
@@ -386,14 +386,17 @@ Kryteria akceptacji:
 - Historia jest dostępna tylko dla zalogowanych użytkowników – anonimowi widzą zachętę do rejestracji w miejscu historii
 
 US-018
-Tytuł: Zapis obliczenia do historii
-Opis: Jako zalogowany użytkownik, chcę aby moje obliczenia były automatycznie zapisywane w historii, abym nie musiał nic robić manualnie.
+Tytuł: Zapis obliczenia do historii i edycja składników
+Opis: Jako zalogowany użytkownik, chcę mieć możliwość korekty rozpoznanych składników oraz zapisania gotowego obliczenia do historii, aby nie przechowywać niechcianych wariantów.
 Kryteria akceptacji:
 
-- Każde pomyślnie wykonane obliczenie (tryb produktu lub dania) jest automatycznie zapisywane w tabeli `calculations` w Supabase dla zalogowanego użytkownika
-- Zapis zawiera pola: `user_id`, `created_at`, `type` (product/dish), `input` (dane wejściowe), `result` (wynik)
-- Zapis następuje po wyświetleniu wyniku, nie blokuje jego wyświetlenia
-- Dla anonimowych użytkowników zapis nie jest realizowany (dane sesji nie są przechowywane trwale)
+- Użytkownik widzi listę rozpoznanych składników w tabeli z możliwością edycji
+- Użytkownik może zmienić obróbkę termiczną każdego ze składników (gotowanie, smażenie, pieczenie, bez obróbki)
+- Użytkownik może usunąć wybrane składniki
+- Zmiana w tabeli natychmiastowo przelicza wartości dla całego dania
+- Jeśli algorytm nie jest pewien obróbki, wymusza na użytkowniku wybór przed pozwoleniem na zapis do historii
+- Zapis obliczenia do bazy (`calculations`) następuje dopiero po kliknięciu przycisku „Zapisz do historii” przez zalogowanego użytkownika
+- Dla anonimowych użytkowników przycisk zapisu wywołuje ekran logowania lub nie jest pokazywany
 
 ### Monetyzacja i subskrypcje
 
@@ -532,12 +535,12 @@ Kryteria akceptacji:
 
 US-029
 Tytuł: Przekroczenie limitu znaków w trybie AI
-Opis: Jako użytkownik trybu AI, gdy próbuję wpisać opis dłuższy niż 800 znaków, chcę aby aplikacja jasno komunikowała limit, aby dostosować opis dania.
+Opis: Jako użytkownik trybu AI, gdy próbuję wpisać opis dłuższy niż 3000 znaków, chcę aby aplikacja jasno komunikowała limit, aby dostosować opis dania.
 Kryteria akceptacji:
 
-- Pole tekstowe wyświetla progresywny licznik znaków (np. „450/800") widoczny przez cały czas pisania
-- Licznik zmienia kolor (np. na czerwony) gdy użytkownik zbliża się do limitu (np. przy >700 znaków)
-- Po osiągnięciu 800 znaków pole przestaje przyjmować nowe znaki (blokada na poziomie UI)
+- Pole tekstowe wyświetla progresywny licznik znaków (np. „450/3000") widoczny przez cały czas pisania
+- Licznik zmienia kolor (np. na czerwony) gdy użytkownik zbliża się do limitu (np. przy >2800 znaków)
+- Po osiągnięciu 3000 znaków pole przestaje przyjmować nowe znaki (blokada na poziomie UI)
 - Backend waliduje limit po znormalizowanym inputie i odrzuca żądania przekraczające dopuszczalną długość
 - Komunikat o przekroczeniu limitu jest zlokalizowany
 
