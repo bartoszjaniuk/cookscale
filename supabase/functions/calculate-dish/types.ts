@@ -31,7 +31,7 @@ export interface MacroTotals {
 
 export interface DishWarning {
   ingredient: string;
-  issue: "unrecognized" | "yield_source_ai" | "external_nutrition" | "cooking_method_required";
+  issue: "unrecognized" | "yield_source_ai" | "external_nutrition" | "cooking_method_required" | "low_confidence" | "medium_confidence" | "name_mismatch";
   yield_factor_estimated?: number;
   nutrition_source?: string;
 }
@@ -82,7 +82,7 @@ export interface LlmIngredientRaw {
   display_name?: string;
   name_pl?: string;
   search_aliases?: string[];
-  cooking_method?: string;
+  cooking_method?: string | null;
   requires_thermal_processing?: boolean;
   weight_g: number;
   cooked_weight_g?: number;

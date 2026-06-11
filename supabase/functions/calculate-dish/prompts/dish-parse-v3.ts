@@ -18,10 +18,16 @@ Map the described preparation to one of exactly four methods: \`boiling\`, \`fry
 - pieczony / grillowany / zapiekany → baking
 - surowy / bez obróbki termicznej / przyprawa / zimny dodatek → none
 
-# Catalog Naming
-- \`name\`: MUST be in English catalog-style Title Case matching USDA seed names (e.g., "Chicken Breast", "Potato", "Olive Oil", "Vegetable Oil").
+# Catalog Naming & Precision
+- \`name\`: MUST be in English catalog-style Title Case matching USDA seed names.
+- PRECISION RULES:
+  - "Mąka pszenna" MUST map to "Wheat Flour", not just "Wheat".
+  - "Mleko" (Milk) MUST include the fat percentage in the name (e.g., "Milk 1.5% Fat", "Milk 2% Fat", "Milk 3.2% Fat"). If unspecified, guess the most likely standard for the recipe, but prioritize being explicit.
+  - Common spices MUST use exact catalog names (e.g., "Nutmeg" for gałka muszkatołowa, "Salt", "Black Pepper").
 - \`name_pl\`: The exact Polish name in lowercase (e.g., "ziemniak", "pierś z kurczaka", "oliwa").
 - \`search_aliases\`: 1-3 extra lowercase synonyms.
+  - For spices: include both Polish and English common names (e.g., ["gałka", "nutmeg"]).
+  - For milk variants: include both fat percentage notation and descriptive names (e.g., ["mleko 2%", "mleko półtłuste", "semi-skimmed milk"]).
 
 # Recipe Parsing & Thermal Processing
 - Extract ingredients from both simple lists and multi-step recipe instructions.
@@ -35,9 +41,10 @@ Map the described preparation to one of exactly four methods: \`boiling\`, \`fry
 - \`cooked_weight_g\`: Include ONLY if explicitly stated (e.g., "100g ugotowanego makaronu").
 - Unit conversions: łyżka (tablespoon) ~14g, łyżeczka (teaspoon) ~5g, szklanka (cup) ~240ml, jajko ~60g. For oils: 10ml oliwy/oleju ≈ 9g.
 
-# External Nutrition
-- ONLY provide this for branded, exotic, or complex sauce blends.
-- MUST NOT use this for common items (meats, veg, grains, dairy, eggs, all common oils, butter, basic pasta/rice). Common oils MUST be matched to the catalog.
+# External Nutrition & Safety
+- ONLY provide this for branded, exotic, or complex sauce blends, or completely unrecognized items.
+- If you are not completely confident in an exact catalog match for an unusual ingredient, you MUST provide external nutrition to avoid incorrect low-confidence (<0.5) database matches downstream.
+- MUST NOT use this for common items (meats, veg, grains, dairy, eggs, all common oils, butter, basic pasta/rice, standard spices). Common items MUST be matched to the catalog.
 - If provided, MUST include both \`external_nutrition_per_100g\` (calories_kcal, protein_g, fat_g, carbs_g) and \`nutrition_source\`.
 
 # Output Schema
@@ -200,56 +207,47 @@ Assistant:
   ]
 }
 
-Example 4 (Multi-line recipe):
+Example 5 (Variants and Spices):
 User: <dish_description>
-Karkówka pieczona z warzywami
-- 300g karkówki
-- 200g marchewki
-- 100g cebuli
-- łyżka oleju rzepakowego
-Kroimy mięso i warzywa. Polewamy olejem. Pieczemy wszystko w 180 stopniach.
+Szklanka mleka 2%, mąka pszenna 100g, szczypta gałki muszkatołowej (1g) i soli (1g).
 </dish_description>
 Assistant:
 {
-  "dish_context": {
-    "default_cooking_method": "baking",
-    "preparation": "Karkówka pieczona z warzywami"
-  },
+  "dish_context": {},
   "ingredients": [
     {
-      "name": "Pork Neck",
-      "weight_g": 300,
-      "requires_thermal_processing": true,
-      "display_name": "Karkówka",
-      "name_pl": "karkówka",
-      "search_aliases": ["wieprzowina", "pork"],
-      "cooking_method": "baking"
+      "name": "Milk 2% Fat",
+      "weight_g": 240,
+      "requires_thermal_processing": false,
+      "display_name": "Mleko 2%",
+      "name_pl": "mleko 2%",
+      "search_aliases": ["mleko", "semi-skimmed milk"],
+      "cooking_method": "none"
     },
     {
-      "name": "Carrot",
-      "weight_g": 200,
-      "requires_thermal_processing": true,
-      "display_name": "Marchewka",
-      "name_pl": "marchew",
-      "search_aliases": ["carrots"],
-      "cooking_method": "baking"
-    },
-    {
-      "name": "Onion",
+      "name": "Wheat Flour",
       "weight_g": 100,
       "requires_thermal_processing": true,
-      "display_name": "Cebula",
-      "name_pl": "cebula",
-      "search_aliases": ["onions"],
-      "cooking_method": "baking"
+      "display_name": "Mąka pszenna",
+      "name_pl": "mąka pszenna",
+      "search_aliases": ["flour", "mąka"]
     },
     {
-      "name": "Canola Oil",
-      "weight_g": 14,
+      "name": "Nutmeg",
+      "weight_g": 1,
       "requires_thermal_processing": false,
-      "display_name": "Olej rzepakowy",
-      "name_pl": "olej rzepakowy",
-      "search_aliases": ["oil", "olej"],
+      "display_name": "Gałka muszkatołowa",
+      "name_pl": "gałka muszkatołowa",
+      "search_aliases": ["gałka", "spice"],
+      "cooking_method": "none"
+    },
+    {
+      "name": "Salt",
+      "weight_g": 1,
+      "requires_thermal_processing": false,
+      "display_name": "Sól",
+      "name_pl": "sól",
+      "search_aliases": ["sol"],
       "cooking_method": "none"
     }
   ]

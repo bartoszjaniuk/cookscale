@@ -2,6 +2,8 @@ import { getSupabaseAdmin } from "../lib/supabase-admin.ts";
 import type { AppLanguage, LlmIngredient, MatchedIngredient, MacroTotals } from "../types.ts";
 
 const PRODUCT_MATCH_MIN_SIMILARITY = 0.25;
+const LOW_CONFIDENCE_THRESHOLD = 0.4;
+const MEDIUM_CONFIDENCE_THRESHOLD = 0.75;
 
 type DbMatchRow = {
   id: string;
@@ -122,7 +124,7 @@ export class ProductMatcherService {
   ): Promise<{
     match?: MatchedIngredient;
     warning?: {
-      issue: "unrecognized" | "yield_source_ai" | "external_nutrition" | "cooking_method_required";
+      issue: "unrecognized" | "yield_source_ai" | "external_nutrition" | "cooking_method_required" | "low_confidence" | "medium_confidence" | "name_mismatch";
       ingredient: string;
       yield_factor_estimated?: number;
       nutrition_source?: string;
@@ -130,9 +132,29 @@ export class ProductMatcherService {
   }> {
     const displayLabel =
       ingredient.display_name ?? ingredient.name_pl ?? ingredient.name;
+      
+    // Pre-match validation
+    // If LLM outputs a name that's obviously wrong for the weight (e.g., "Salmon" for 5g with "Worcestershire" display_name), log and reject
+    if (
+      ingredient.weight_g <= 15 && 
+      (ingredient.name.toLowerCase().includes("salmon") || ingredient.name.toLowerCase().includes("chicken") || ingredient.name.toLowerCase().includes("beef") || ingredient.name.toLowerCase().includes("pork") || ingredient.name.toLowerCase().includes("bell pepper")) &&
+      ingredient.display_name &&
+      !ingredient.display_name.toLowerCase().includes("łosoś") &&
+      !ingredient.display_name.toLowerCase().includes("kurczak") &&
+      !ingredient.display_name.toLowerCase().includes("wołow") &&
+      !ingredient.display_name.toLowerCase().includes("wieprz") &&
+      !ingredient.display_name.toLowerCase().includes("papryk")
+    ) {
+      console.warn("Pre-match validation failed: Suspiciously small weight for main ingredient without matching display name", ingredient);
+      if (!ingredient.external_nutrition_per_100g) {
+        return { warning: { issue: "name_mismatch", ingredient: displayLabel } };
+      }
+    }
+
     const terms = this.collectSearchTerms(ingredient);
     const match = await this.findBestDbMatch(terms, locale);
 
+    // Fallback for unrecognized (< 0.25)
     if (!match || match.matched_confidence < PRODUCT_MATCH_MIN_SIMILARITY) {
       const external = this.buildExternalItem(ingredient, locale);
       if (external) {
@@ -140,6 +162,22 @@ export class ProductMatcherService {
           match: external,
           warning: {
             issue: "external_nutrition",
+            ingredient: displayLabel,
+            nutrition_source: ingredient.nutrition_source,
+          },
+        };
+      }
+      return { warning: { issue: "unrecognized", ingredient: displayLabel } };
+    }
+
+    // Threshold 0.25-0.4: Low confidence zone
+    if (match.matched_confidence >= PRODUCT_MATCH_MIN_SIMILARITY && match.matched_confidence < LOW_CONFIDENCE_THRESHOLD) {
+      const external = this.buildExternalItem(ingredient, locale);
+      if (external) {
+        return {
+          match: external,
+          warning: {
+            issue: "low_confidence",
             ingredient: displayLabel,
             nutrition_source: ingredient.nutrition_source,
           },
@@ -164,7 +202,12 @@ export class ProductMatcherService {
 
     let yieldFactor = 1.0;
     let yieldSource: "db" | "ai" = "db";
-    let issue: "yield_source_ai" | "cooking_method_required" | undefined;
+    let issue: "yield_source_ai" | "cooking_method_required" | "medium_confidence" | undefined;
+
+    // Threshold 0.4-0.75: Medium confidence zone (will accept match but warn)
+    if (match.matched_confidence >= LOW_CONFIDENCE_THRESHOLD && match.matched_confidence < MEDIUM_CONFIDENCE_THRESHOLD) {
+      issue = "medium_confidence";
+    }
 
     if (ingredient.cooking_method === "none") {
       yieldFactor = 1.0;
@@ -172,7 +215,7 @@ export class ProductMatcherService {
     } else if (ingredient.cooking_method === null) {
       yieldFactor = 1.0;
       yieldSource = "db";
-      issue = "cooking_method_required";
+      issue = issue || "cooking_method_required";
     } else {
       if (yieldData) {
         yieldFactor = yieldData.yield_factor;
@@ -186,7 +229,7 @@ export class ProductMatcherService {
           .maybeSingle();
 
         yieldSource = "ai";
-        issue = "yield_source_ai";
+        issue = issue || "yield_source_ai";
         if (ingredient.cooked_weight_g && ingredient.weight_g) {
           yieldFactor = ingredient.cooked_weight_g / ingredient.weight_g;
         } else if (fallbackData) {

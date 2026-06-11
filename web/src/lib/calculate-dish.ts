@@ -24,7 +24,14 @@ export interface CalculateDishApiItem {
 
 export interface CalculateDishApiWarning {
   ingredient: string;
-  issue: "unrecognized" | "yield_source_ai" | "external_nutrition";
+  issue:
+    | "unrecognized"
+    | "yield_source_ai"
+    | "external_nutrition"
+    | "cooking_method_required"
+    | "low_confidence"
+    | "medium_confidence"
+    | "name_mismatch";
   yield_factor_estimated?: number;
   nutrition_source?: string;
 }
@@ -77,7 +84,12 @@ function toUiMacros(m: CalculateDishApiMacros) {
 }
 
 function slugToMethod(slug: string | null): Method | null {
-  if (slug === "boiling" || slug === "frying" || slug === "baking" || slug === "none") {
+  if (
+    slug === "boiling" ||
+    slug === "frying" ||
+    slug === "baking" ||
+    slug === "none"
+  ) {
     return slug;
   }
   return null;
@@ -141,7 +153,9 @@ export async function calculateDish(
   const anonKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY as string;
 
   if (!supabaseUrl || !anonKey) {
-    return { error: { error: "internal_error", message: "Missing Supabase config" } };
+    return {
+      error: { error: "internal_error", message: "Missing Supabase config" },
+    };
   }
 
   const headers: Record<string, string> = {
@@ -153,14 +167,11 @@ export async function calculateDish(
     headers.Authorization = `Bearer ${accessToken}`;
   }
 
-  const response = await fetch(
-    `${supabaseUrl}/functions/v1/calculate-dish`,
-    {
-      method: "POST",
-      headers,
-      body: JSON.stringify({ description, language }),
-    },
-  );
+  const response = await fetch(`${supabaseUrl}/functions/v1/calculate-dish`, {
+    method: "POST",
+    headers,
+    body: JSON.stringify({ description, language }),
+  });
 
   const body = (await response.json().catch(() => ({}))) as
     | CalculateDishApiResponse
