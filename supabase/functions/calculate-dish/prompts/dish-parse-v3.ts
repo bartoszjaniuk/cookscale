@@ -23,7 +23,23 @@ Map the described preparation to one of exactly four methods: \`boiling\`, \`fry
 - PRECISION RULES:
   - "Mąka pszenna" MUST map to "Wheat Flour", not just "Wheat".
   - "Mleko" (Milk) MUST include the fat percentage in the name (e.g., "Milk 1.5% Fat", "Milk 2% Fat", "Milk 3.2% Fat"). If unspecified, guess the most likely standard for the recipe, but prioritize being explicit.
-  - Common spices MUST use exact catalog names (e.g., "Nutmeg" for gałka muszkatołowa, "Salt", "Black Pepper").
+  - Common spices MUST use exact catalog names. Polish → English mappings:
+    - sól → "Salt"
+    - pieprz / pieprz czarny → "Black Pepper" (NOT "Bell pepper")
+    - oregano → "Oregano"
+    - curry → "Curry Powder"
+    - czosnek granulowany / czosnek w proszku → "Granulated Garlic" (NOT "Garlic")
+    - cebula granulowana → "Granulated Onion" (NOT "Onion")
+    - bazylia suszona → "Dried Basil" (NOT "Basil")
+    - przyprawa do kurczaka / poultry seasoning → "Poultry Seasoning"
+    - papryka słodka → "Sweet Paprika" (NOT "Bell pepper")
+    - cynamon → "Ground Cinnamon"
+    - kmin rzymski → "Ground Cumin"
+    - chili powder → "Chili Powder"
+    - imbir mielony → "Ground Ginger"
+    - płatki chili → "Red Pepper Flakes"
+    - pieprz ziołowy → "Herb Seasoning"
+    - gałka muszkatołowa → "Nutmeg"
 - \`name_pl\`: The exact Polish name in lowercase (e.g., "ziemniak", "pierś z kurczaka", "oliwa").
 - \`search_aliases\`: 1-3 extra lowercase synonyms.
   - For spices: include both Polish and English common names (e.g., ["gałka", "nutmeg"]).
@@ -248,6 +264,61 @@ Assistant:
       "display_name": "Sól",
       "name_pl": "sól",
       "search_aliases": ["sol"],
+      "cooking_method": "none"
+    }
+  ]
+}
+
+Example 6 (Multiple spices):
+User: <dish_description>
+200g piersi z kurczaka, szczypta soli (2g), pieprz czarny (1g), oregano (1g), curry (2g)
+</dish_description>
+Assistant:
+{
+  "dish_context": {},
+  "ingredients": [
+    {
+      "name": "Chicken Breast",
+      "weight_g": 200,
+      "requires_thermal_processing": true,
+      "display_name": "Pierś z kurczaka",
+      "name_pl": "pierś z kurczaka",
+      "search_aliases": ["kurczak"]
+    },
+    {
+      "name": "Salt",
+      "weight_g": 2,
+      "requires_thermal_processing": false,
+      "display_name": "Sól",
+      "name_pl": "sól",
+      "search_aliases": ["sol"],
+      "cooking_method": "none"
+    },
+    {
+      "name": "Black Pepper",
+      "weight_g": 1,
+      "requires_thermal_processing": false,
+      "display_name": "Pieprz czarny",
+      "name_pl": "pieprz czarny",
+      "search_aliases": ["pieprz", "pepper"],
+      "cooking_method": "none"
+    },
+    {
+      "name": "Oregano",
+      "weight_g": 1,
+      "requires_thermal_processing": false,
+      "display_name": "Oregano",
+      "name_pl": "oregano",
+      "search_aliases": ["oregano suszone"],
+      "cooking_method": "none"
+    },
+    {
+      "name": "Curry Powder",
+      "weight_g": 2,
+      "requires_thermal_processing": false,
+      "display_name": "Curry",
+      "name_pl": "curry",
+      "search_aliases": ["przyprawa curry"],
       "cooking_method": "none"
     }
   ]
