@@ -23,28 +23,39 @@ SET
 WHERE name_en = 'Blue cheese' AND (name_pl IS NULL OR name_pl != 'ser z niebieską pleśnią');
 
 -- 4. Insert new missing products: milk variants
-INSERT INTO products (name_en, name_pl, calories_kcal, protein_g, fat_g, carbs_g)
-VALUES 
+-- products.name_en has no unique constraint; use NOT EXISTS (same pattern as add_eggs_category_and_product)
+insert into products (source, name_en, name_pl, calories_kcal, protein_g, fat_g, carbs_g)
+select
+    'system'::source_enum,
+    v.name_en,
+    v.name_pl,
+    v.calories_kcal,
+    v.protein_g,
+    v.fat_g,
+    v.carbs_g
+from (values
     ('Milk 1.5% Fat', 'mleko 1.5%', 47, 3.3, 1.5, 4.8),
     ('Milk 2% Fat', 'mleko 2%', 50, 3.3, 2.0, 4.8),
     ('Milk 3.2% Fat', 'mleko 3.2%', 60, 3.3, 3.2, 4.8)
-ON CONFLICT (name_en) DO UPDATE 
-SET 
-    name_pl = EXCLUDED.name_pl,
-    calories_kcal = EXCLUDED.calories_kcal,
-    protein_g = EXCLUDED.protein_g,
-    fat_g = EXCLUDED.fat_g,
-    carbs_g = EXCLUDED.carbs_g;
+) as v(name_en, name_pl, calories_kcal, protein_g, fat_g, carbs_g)
+where not exists (
+    select 1 from products p where p.name_en = v.name_en
+);
 
 -- 5. Insert new missing products: spices and condiments
-INSERT INTO products (name_en, name_pl, calories_kcal, protein_g, fat_g, carbs_g)
-VALUES 
+insert into products (source, name_en, name_pl, calories_kcal, protein_g, fat_g, carbs_g)
+select
+    'system'::source_enum,
+    v.name_en,
+    v.name_pl,
+    v.calories_kcal,
+    v.protein_g,
+    v.fat_g,
+    v.carbs_g
+from (values
     ('Worcestershire Sauce', 'sos worcestershire', 78, 0, 0, 19),
     ('Nutmeg', 'gałka muszkatołowa', 525, 5.8, 36.3, 49.3)
-ON CONFLICT (name_en) DO UPDATE 
-SET 
-    name_pl = EXCLUDED.name_pl,
-    calories_kcal = EXCLUDED.calories_kcal,
-    protein_g = EXCLUDED.protein_g,
-    fat_g = EXCLUDED.fat_g,
-    carbs_g = EXCLUDED.carbs_g;
+) as v(name_en, name_pl, calories_kcal, protein_g, fat_g, carbs_g)
+where not exists (
+    select 1 from products p where p.name_en = v.name_en
+);
